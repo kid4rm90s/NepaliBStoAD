@@ -1,418 +1,684 @@
 /**
- * Converts a date from Bikram Sambat (BS) to Anno Domini (AD).
- *
- * @param {string} bsDate The date in BS format (YYYY-MM-DD).
- * @return The date in AD format (YYYY-MM-DD).
- * @customfunction
+ * NepaliDate - Nepali (Bikram Sambat) Date Conversion Library
+ * Converts dates between BS (Bikram Sambat) and AD (Anno Domini)
+ * 
+ * @version 2.0.0
+ * @license MIT
+ * 
+ * Usage:
+ * - Google Sheets: Use BS_TO_AD() and AD_TO_BS() as custom functions
+ * - Tampermonkey: @require this file, access via NepaliDate global
+ * - Node.js: const NepaliDate = require('nepali-date-converter')
+ * - Browser: <script src="..."></script>, access via window.NepaliDate
  */
-function BS_TO_AD(bsDate) {
-  if (!bsDate) {
-    return null;
+(function (root, factory) {
+  'use strict';
+  
+  // UMD (Universal Module Definition) pattern
+  if (typeof module !== 'undefined' && module.exports) {
+    // Node.js / CommonJS
+    module.exports = factory();
+  } else if (typeof define === 'function' && define.amd) {
+    // AMD (RequireJS)
+    define(factory);
+  } else {
+    // Browser global / Google Apps Script / Tampermonkey
+    var lib = factory();
+    
+    // Export as NepaliDate namespace
+    root.NepaliDate = lib;
+    
+    // Also expose individual functions globally for Google Sheets compatibility
+    root.DateBS = lib.DateBS;
+    root.BSMonths = lib.BSMonths;
+    root.BS_TO_AD = lib.BS_TO_AD;
+    root.AD_TO_BS = lib.AD_TO_BS;
   }
-  // Handle Google Sheets error values gracefully
-  var errorValues = ['#REF!', '#VALUE!', '#N/A', '#DIV/0!', '#NAME?', '#NULL!'];
-  if (typeof bsDate === 'string' && errorValues.indexOf(bsDate.trim().toUpperCase()) !== -1) {
-    return '';
-  }
-  try {
-    var bs = DateBS.fromString(bsDate);
-    var ad = bs.toAD();
-    var adYear = ad.getFullYear();
-    var adMonth = ad.getMonth() + 1;
-    var adDay = ad.getDate();
-    return `${adYear}-${String(adMonth).padStart(2, '0')}-${String(adDay).padStart(2, '0')}`;
-  } catch (e) {
-    return e.message || 'Invalid BS date format. Use YYYY-MM-DD or "YYYY MonthName DD".';
-  }
-}
+}(typeof globalThis !== 'undefined' ? globalThis : (typeof window !== 'undefined' ? window : this), function () {
+  'use strict';
 
-/**
- * no of days in months from year 2000 to 2100 BS
- * @constant
- **/
-var BSMonths = [
-  [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31], //2000
-  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30], //2001
-  [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
-  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
-  [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
-  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
-  [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
-  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
-  [31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 29, 31],
-  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
-  [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
-  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
-  [31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30],
-  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
-  [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
-  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
-  [31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30],
-  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
-  [31, 32, 31, 32, 31, 30, 30, 29, 30, 29, 30, 30],
-  [31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
-  [31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30],
-  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
-  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30],
-  [31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
-  [31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30],
-  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
-  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
-  [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
-  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
-  [31, 31, 32, 31, 32, 30, 30, 29, 30, 29, 30, 30],
-  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
-  [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
-  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
-  [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
-  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
-  [30, 32, 31, 32, 31, 31, 29, 30, 30, 29, 29, 31],
-  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
-  [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
-  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
-  [31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30],
-  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
-  [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
-  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
-  [31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30],
-  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
-  [31, 32, 31, 32, 31, 30, 30, 29, 30, 29, 30, 30],
-  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
-  [31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30],
-  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
-  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30],
-  [31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
-  [31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30],
-  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
-  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30],
-  [31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
-  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
-  [31, 31, 32, 31, 32, 30, 30, 29, 30, 29, 30, 30],
-  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
-  [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
-  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
-  [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
-  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
-  [30, 32, 31, 32, 31, 31, 29, 30, 29, 30, 29, 31],
-  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
-  [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
-  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
-  [31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 29, 31],
-  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
-  [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
-  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
-  [31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30],
-  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30], //2071
-  [31, 32, 31, 32, 31, 30, 30, 29, 30, 29, 30, 30], //2072
-  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31], //2073
-  [31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30],
-  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
-  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30],
-  [31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
-  [31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30],
-  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
-  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30],
-  [31, 31, 32, 32, 31, 30, 30, 30, 29, 30, 30, 30],
-  [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 30, 30],
-  [31, 31, 32, 31, 31, 30, 30, 30, 29, 30, 30, 30],
-  [31, 31, 32, 31, 31, 30, 30, 30, 29, 30, 30, 30],
-  [31, 32, 31, 32, 30, 31, 30, 30, 29, 30, 30, 30],
-  [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 30, 30],
-  [31, 31, 32, 31, 31, 31, 30, 30, 29, 30, 30, 30],
-  [30, 31, 32, 32, 30, 31, 30, 30, 29, 30, 30, 30],
-  [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 30, 30],
-  [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 30, 30], //2090
-  [31, 31, 32, 31, 31, 31, 30, 30, 29, 30, 30, 30],
-  [30, 31, 32, 32, 31, 30, 30, 30, 29, 30, 30, 30],
-  [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 30, 30],
-  [31, 31, 32, 31, 31, 30, 30, 30, 29, 30, 30, 30],
-  [31, 31, 32, 31, 31, 31, 30, 29, 30, 30, 30, 30],
-  [30, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
-  [31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 30, 30],
-  [31, 31, 32, 31, 31, 31, 29, 30, 29, 30, 29, 31],
-  [31, 31, 32, 31, 31, 31, 30, 29, 29, 30, 30, 30], //2099
-];
-
-/**
- * class that facilates in conversion of date from BS to AD and vice versa
- * @class DateBS
- **/
-function DateBS(year, month, day) {
-  this.year = year;
-  this.month = month;
-  this.day = day;
-  return this;
-}
-
-/**
- * create BS Date using string format %Y-%m-%d
- * @param {string} datestring: BS date in string format %Y-%m-%d
- * @static
- **/
-DateBS.fromString = function (datestring) {
-  // Handle Google Sheets native Date object (which is AD, but user may enter BS date as date-formatted cell)
-  if (Object.prototype.toString.call(datestring) === '[object Date]' && !isNaN(datestring)) {
-    // Extract year, month, day as if the user entered a BS date in a date cell
-    var year = datestring.getFullYear();
-    var month = datestring.getMonth() + 1;
-    var day = datestring.getDate();
-    // Try to construct as BS date
-    return new DateBS(year, month, day);
+  /**
+   * Converts a date from Bikram Sambat (BS) to Anno Domini (AD).
+   *
+   * @param {string|Date|number} bsDate The date in BS format (YYYY-MM-DD).
+   * @return {string} The date in AD format (YYYY-MM-DD).
+   * @customfunction
+   */
+  function BS_TO_AD(bsDate) {
+    if (!bsDate) {
+      return null;
+    }
+    // Handle Google Sheets error values gracefully
+    var errorValues = ['#REF!', '#VALUE!', '#N/A', '#DIV/0!', '#NAME?', '#NULL!'];
+    if (typeof bsDate === 'string' && errorValues.indexOf(bsDate.trim().toUpperCase()) !== -1) {
+      return '';
+    }
+    try {
+      var bs = DateBS.fromString(bsDate);
+      var ad = bs.toAD();
+      var adYear = ad.getFullYear();
+      var adMonth = ad.getMonth() + 1;
+      var adDay = ad.getDate();
+      return adYear + '-' + String(adMonth).padStart(2, '0') + '-' + String(adDay).padStart(2, '0');
+    } catch (e) {
+      return e.message || 'Invalid BS date format. Use YYYY-MM-DD or "YYYY MonthName DD".';
+    }
   }
-  // Handle Google Sheets serial number (if user enters BS date as a number-formatted cell)
-  if (typeof datestring === 'number') {
-    // Google Sheets serial dates: 1 = 1899-12-31, but user may enter BS date as number (e.g., 20780101)
-    // If it's 8 digits, treat as YYYYMMDD
-    var numStr = String(datestring);
-    if (/^\d{8}$/.test(numStr)) {
-      var year = parseInt(numStr.slice(0, 4));
-      var month = parseInt(numStr.slice(4, 6));
-      var day = parseInt(numStr.slice(6, 8));
+
+  /**
+   * Converts a date from Anno Domini (AD) to Bikram Sambat (BS).
+   *
+   * @param {string|Date|number} adDate The date in AD format (YYYY-MM-DD) or Date object.
+   * @param {boolean} [asObject=false] If true, returns DateBS object instead of string.
+   * @return {string|DateBS} The date in BS format (YYYY-MM-DD) or DateBS object.
+   * @customfunction
+   */
+  function AD_TO_BS(adDate, asObject) {
+    if (!adDate) {
+      // Return today's date in BS if no argument provided
+      var bs = DateBS.fromAD(new Date());
+      return asObject ? bs : bs.toString();
+    }
+    // Handle Google Sheets error values gracefully
+    var errorValues = ['#REF!', '#VALUE!', '#N/A', '#DIV/0!', '#NAME?', '#NULL!'];
+    if (typeof adDate === 'string' && errorValues.indexOf(adDate.trim().toUpperCase()) !== -1) {
+      return '';
+    }
+    try {
+      var date;
+      if (adDate instanceof Date) {
+        date = adDate;
+      } else if (typeof adDate === 'number') {
+        // Handle Google Sheets serial date number
+        // Google Sheets epoch is December 30, 1899
+        var sheetsEpoch = new Date(1899, 11, 30);
+        date = new Date(sheetsEpoch.getTime() + adDate * 24 * 60 * 60 * 1000);
+      } else if (typeof adDate === 'string') {
+        // Parse string date
+        var parsed = adDate.match(/(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})/);
+        if (parsed) {
+          date = new Date(parseInt(parsed[1]), parseInt(parsed[2]) - 1, parseInt(parsed[3]));
+        } else {
+          date = new Date(adDate);
+        }
+      } else {
+        date = new Date(adDate);
+      }
+      
+      if (isNaN(date.getTime())) {
+        throw new Error('Invalid AD date format. Use YYYY-MM-DD or Date object.');
+      }
+      
+      var bs = DateBS.fromAD(date);
+      return asObject ? bs : bs.toString();
+    } catch (e) {
+      return e.message || 'Invalid AD date format. Use YYYY-MM-DD or Date object.';
+    }
+  }
+
+  /**
+   * Get today's date in Bikram Sambat (BS).
+   *
+   * @param {boolean} [asObject=false] If true, returns DateBS object instead of string.
+   * @return {string|DateBS} Today's date in BS format (YYYY-MM-DD) or DateBS object.
+   */
+  function todayBS(asObject) {
+    var bs = DateBS.fromAD(new Date());
+    return asObject ? bs : bs.toString();
+  }
+
+  /**
+   * Validates a BS date without throwing an error.
+   *
+   * @param {string|number} bsDate The date in BS format (YYYY-MM-DD).
+   * @return {boolean} True if the date is valid, false otherwise.
+   */
+  function isValidBS(bsDate) {
+    try {
+      DateBS.fromString(bsDate);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /**
+   * Validates an AD date for conversion to BS.
+   *
+   * @param {string|Date|number} adDate The date in AD format.
+   * @return {boolean} True if the date can be converted to BS, false otherwise.
+   */
+  function isValidAD(adDate) {
+    try {
+      var result = AD_TO_BS(adDate);
+      return result && !result.includes('Invalid') && !result.includes('Error');
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /**
+   * no of days in months from year 2000 to 2100 BS
+   * @constant
+   **/
+  var BSMonths = [
+    [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31], //2000
+    [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30], //2001
+    [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
+    [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+    [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
+    [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+    [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
+    [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+    [31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 29, 31],
+    [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+    [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
+    [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+    [31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30],
+    [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+    [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
+    [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+    [31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30],
+    [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+    [31, 32, 31, 32, 31, 30, 30, 29, 30, 29, 30, 30],
+    [31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
+    [31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30],
+    [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+    [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30],
+    [31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
+    [31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30],
+    [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+    [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+    [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
+    [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+    [31, 31, 32, 31, 32, 30, 30, 29, 30, 29, 30, 30],
+    [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+    [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
+    [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+    [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
+    [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+    [30, 32, 31, 32, 31, 31, 29, 30, 30, 29, 29, 31],
+    [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+    [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
+    [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+    [31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30],
+    [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+    [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
+    [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+    [31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30],
+    [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+    [31, 32, 31, 32, 31, 30, 30, 29, 30, 29, 30, 30],
+    [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+    [31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30],
+    [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+    [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30],
+    [31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
+    [31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30],
+    [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+    [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30],
+    [31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
+    [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+    [31, 31, 32, 31, 32, 30, 30, 29, 30, 29, 30, 30],
+    [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+    [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
+    [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+    [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
+    [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+    [30, 32, 31, 32, 31, 31, 29, 30, 29, 30, 29, 31],
+    [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+    [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
+    [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+    [31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 29, 31],
+    [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+    [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
+    [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+    [31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30],
+    [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30], //2071
+    [31, 32, 31, 32, 31, 30, 30, 29, 30, 29, 30, 30], //2072
+    [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31], //2073
+    [31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30],
+    [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+    [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30],
+    [31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
+    [31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30],
+    [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+    [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30],
+    [31, 31, 32, 32, 31, 30, 30, 30, 29, 30, 30, 30], //2081
+    [31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 30, 30], //2082 (fixed: Baishakh=31)
+    [31, 31, 32, 31, 31, 30, 30, 30, 29, 30, 30, 30], //2083
+    [31, 31, 32, 31, 31, 30, 30, 30, 29, 30, 30, 30], //2084
+    [31, 32, 31, 32, 30, 31, 30, 30, 29, 30, 30, 30],
+    [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 30, 30],
+    [31, 31, 32, 31, 31, 31, 30, 30, 29, 30, 30, 30],
+    [30, 31, 32, 32, 30, 31, 30, 30, 29, 30, 30, 30],
+    [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 30, 30],
+    [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 30, 30], //2090
+    [31, 31, 32, 31, 31, 31, 30, 30, 29, 30, 30, 30],
+    [30, 31, 32, 32, 31, 30, 30, 30, 29, 30, 30, 30],
+    [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 30, 30],
+    [31, 31, 32, 31, 31, 30, 30, 30, 29, 30, 30, 30],
+    [31, 31, 32, 31, 31, 31, 30, 29, 30, 30, 30, 30],
+    [30, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
+    [31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 30, 30],
+    [31, 31, 32, 31, 31, 31, 29, 30, 29, 30, 29, 31],
+    [31, 31, 32, 31, 31, 31, 30, 29, 29, 30, 30, 30], //2099
+  ];
+
+  /**
+   * Month names in English
+   * @constant
+   */
+  var MONTH_NAMES_EN = ['Baishakh', 'Jestha', 'Ashadh', 'Shrawan', 'Bhadra', 'Ashwin', 'Kartik', 'Mangsir', 'Poush', 'Magh', 'Falgun', 'Chaitra'];
+
+  /**
+   * Month names in Nepali
+   * @constant
+   */
+  var MONTH_NAMES_NE = ['वैशाख', 'ज्येष्ठ', 'असार', 'साउन', 'भदौ', 'असोज', 'कात्तिक', 'मंसिर', 'पुष', 'माघ', 'फागुन', 'चैत'];
+
+  /**
+   * Weekday names in English
+   * @constant
+   */
+  var WEEKDAY_NAMES_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+  /**
+   * Weekday names in Nepali
+   * @constant
+   */
+  var WEEKDAY_NAMES_NE = ['आइतबार', 'सोमबार', 'मंगलबार', 'बुधबार', 'बिहीबार', 'शुक्रबार', 'शनिबार'];
+
+  /**
+   * class that facilates in conversion of date from BS to AD and vice versa
+   * @class DateBS
+   **/
+  function DateBS(year, month, day) {
+    this.year = year;
+    this.month = month;
+    this.day = day;
+    return this;
+  }
+
+  /**
+   * create BS Date using string format %Y-%m-%d
+   * @param {string} datestring: BS date in string format %Y-%m-%d
+   * @static
+   **/
+  DateBS.fromString = function (datestring) {
+    // Handle Google Sheets native Date object (which is AD, but user may enter BS date as date-formatted cell)
+    if (Object.prototype.toString.call(datestring) === '[object Date]' && !isNaN(datestring)) {
+      // Extract year, month, day as if the user entered a BS date in a date cell
+      var year = datestring.getFullYear();
+      var month = datestring.getMonth() + 1;
+      var day = datestring.getDate();
+      // Try to construct as BS date
       return new DateBS(year, month, day);
     }
-    // Otherwise, treat as string
-    datestring = String(datestring);
-  }
-  // Convert to string to handle cases where input might be a date object or number
-  var dateStr = String(datestring).trim();
-  
-  // Define month name mappings (both English and Nepali)
-  var monthNames = {
-    'baishakh': 1, 'बैशाख': 1, 'वैशाख': 1,
-    'jestha': 2, 'jyestha': 2, 'ज्येष्ठ': 2,
-    'ashadh': 3, 'asar': 3, 'असार': 3, 'आषाढ': 3,
-    'shrawan': 4, 'saun': 4, 'साउन': 4, 'श्रावण': 4,
-    'bhadra': 5, 'bhadau': 5, 'भदौ': 5, 'भाद्र': 5,
-    'ashwin': 6, 'asoj': 6, 'असोज': 6, 'आश्विन': 6,
-    'kartik': 7, 'कात्तिक': 7, 'कार्तिक': 7,
-    'mangsir': 8, 'mangshir': 8, 'मंसिर': 8, 'मार्गशीर्ष': 8,
-    'poush': 9, 'paush': 9, 'पुष': 9, 'पौष': 9,
-    'magh': 10, 'माघ': 10,
-    'falgun': 11, 'phalgun': 11, 'फागुन': 11, 'फाल्गुन': 11,
-    'chaitra': 12, 'चैत': 12, 'चैत्र': 12
-  };
-  
-  var year, month, day, info;
-  
-  // Try YYYY-MM-DD format first
-  info = dateStr.match(/(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})/);
-  if (info) {
-    year = parseInt(info[1]);
-    month = parseInt(info[2]);
-    day = parseInt(info[3]);
-  } else {
-    // Try "YYYY MonthName DD" format (e.g., "2048 Poush 12")
-    info = dateStr.match(/(\d{4})\s+([a-zA-Zा-ौ]+)\s+(\d{1,2})/);
+    // Handle Google Sheets serial number (if user enters BS date as a number-formatted cell)
+    if (typeof datestring === 'number') {
+      // Google Sheets serial dates: 1 = 1899-12-31, but user may enter BS date as number (e.g., 20780101)
+      // If it's 8 digits, treat as YYYYMMDD
+      var numStr = String(datestring);
+      if (/^\d{8}$/.test(numStr)) {
+        var year = parseInt(numStr.slice(0, 4));
+        var month = parseInt(numStr.slice(4, 6));
+        var day = parseInt(numStr.slice(6, 8));
+        return new DateBS(year, month, day);
+      }
+      // Otherwise, treat as string
+      datestring = String(datestring);
+    }
+    // Convert to string to handle cases where input might be a date object or number
+    var dateStr = String(datestring).trim();
+    
+    // Define month name mappings (both English and Nepali)
+    var monthNames = {
+      'baishakh': 1, 'बैशाख': 1, 'वैशाख': 1,
+      'jestha': 2, 'jyestha': 2, 'ज्येष्ठ': 2,
+      'ashadh': 3, 'asar': 3, 'असार': 3, 'आषाढ': 3,
+      'shrawan': 4, 'saun': 4, 'साउन': 4, 'श्रावण': 4,
+      'bhadra': 5, 'bhadau': 5, 'भदौ': 5, 'भाद्र': 5,
+      'ashwin': 6, 'asoj': 6, 'असोज': 6, 'आश्विन': 6,
+      'kartik': 7, 'कात्तिक': 7, 'कार्तिक': 7,
+      'mangsir': 8, 'mangshir': 8, 'मंसिर': 8, 'मार्गशीर्ष': 8,
+      'poush': 9, 'paush': 9, 'पुष': 9, 'पौष': 9,
+      'magh': 10, 'माघ': 10,
+      'falgun': 11, 'phalgun': 11, 'फागुन': 11, 'फाल्गुन': 11,
+      'chaitra': 12, 'चैत': 12, 'चैत्र': 12
+    };
+    
+    var year, month, day, info;
+    
+    // Try YYYY-MM-DD format first
+    info = dateStr.match(/(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})/);
     if (info) {
       year = parseInt(info[1]);
-      var monthStr = info[2].toLowerCase().trim();
+      month = parseInt(info[2]);
       day = parseInt(info[3]);
-      
-      // Look up month number from month name
-      month = monthNames[monthStr];
-      if (!month) {
-        throw new Error("Unknown month name: '" + info[2] + "'. Supported formats: YYYY-MM-DD or 'YYYY MonthName DD'");
-      }
     } else {
-      throw new Error("Invalid BS date format. Expected YYYY-MM-DD or 'YYYY MonthName DD' but got: '" + dateStr + "'");
-    }
-  }
-  
-  if (isNaN(year) || isNaN(month) || isNaN(day)) {
-    throw new Error('Invalid numbers in date: ' + dateStr);
-  }
-  if (year < 2000 || year > 2099) throw new Error('Year out of supported range (2000-2099 BS). Got: ' + year);
-  if (month < 1 || month > 12) throw new Error('Month out of range (1-12). Got: ' + month);
-  var yearIndex = year - 2000;
-  if (yearIndex < 0 || yearIndex >= BSMonths.length) throw new Error('Year data not available for: ' + year);
-  var maxDay = BSMonths[yearIndex][month - 1];
-  if (day < 1 || day > maxDay) throw new Error('Day out of range for year ' + year + ' month ' + month + '. Max day is ' + maxDay + ' but got: ' + day);
-  return new DateBS(year, month, day);
-};
-
-/**
- * converts BS Date to string
- **/
-DateBS.prototype.toString = function () {
-  return this.year + '-' + this.month + '-' + this.day;
-};
-
-/**
- * get the day of the year
- **/
-DateBS.prototype.dayOfYear = function () {
-  var months = this.monthsInYear();
-  var sum = 0;
-  for (var i = 0; i < this.month - 1; i++) {
-    sum += months[i];
-  }
-  return sum + this.day;
-};
-
-/**
- * get the day in year
- * @class DateBS
- **/
-DateBS.prototype.daysInYear = function () {
-  return DateBS.daysInYear(this.year);
-};
-
-/**
- * get the no of days in a year
- * @param {number} year: number in year
- * @static
- **/
-DateBS.daysInYear = function (year) {
-  var months = DateBS.monthsInYear(year);
-  var sum = 0;
-  for (var i = 0; i < months.length; i++) {
-    sum += months[i];
-  }
-  return sum;
-};
-
-/**
- * get number of days since specific day in BSMonths
- * @param {DateBS} date: date in DateBS format which is by default 2000-9-17
- **/
-DateBS.prototype.daysSince = function (date) {
-  if (!date) date = new DateBS(2000, 9, 17);
-  var days = 0;
-  for (var year = date.year; year < this.year; year++) {
-    days += DateBS.daysInYear(year);
-  }
-  days = days + this.dayOfYear() - date.dayOfYear();
-  return days;
-};
-
-/**
- * get the date in BS greater than specific day, month and year
- * @param {number} day: no of days to add
- * @param {number} month: no of months to add
- * @param {number} year: no of years to add
- **/
-DateBS.prototype.add = function (day, month, year) {
-  if (!month) month = 0;
-  if (!year) year = 0;
-  this.month += month;
-  this.year += year + Math.floor(this.month / 12);
-  this.month = this.month % 12;
-  var diff = day;
-  while (diff > 0) {
-    var daysInMonth = this.daysInMonth();
-    var daysLeft = daysInMonth - this.day + 1;
-    if (diff >= daysLeft) {
-      if (this.month === 12) {
-        this.year += 1;
-        this.month = 1;
-        this.day = 1;
+      // Try "YYYY MonthName DD" format (e.g., "2048 Poush 12")
+      info = dateStr.match(/(\d{4})\s+([a-zA-Zा-ौ]+)\s+(\d{1,2})/);
+      if (info) {
+        year = parseInt(info[1]);
+        var monthStr = info[2].toLowerCase().trim();
+        day = parseInt(info[3]);
+        
+        // Look up month number from month name
+        month = monthNames[monthStr];
+        if (!month) {
+          throw new Error("Unknown month name: '" + info[2] + "'. Supported formats: YYYY-MM-DD or 'YYYY MonthName DD'");
+        }
       } else {
-        this.month += 1;
-        this.day = 1;
+        throw new Error("Invalid BS date format. Expected YYYY-MM-DD or 'YYYY MonthName DD' but got: '" + dateStr + "'");
       }
-      diff -= daysLeft;
-    } else {
-      this.day += diff;
-      diff -= diff;
     }
-  }
-  return this;
-};
+    
+    if (isNaN(year) || isNaN(month) || isNaN(day)) {
+      throw new Error('Invalid numbers in date: ' + dateStr);
+    }
+    if (year < 2000 || year > 2099) throw new Error('Year out of supported range (2000-2099 BS). Got: ' + year);
+    if (month < 1 || month > 12) throw new Error('Month out of range (1-12). Got: ' + month);
+    var yearIndex = year - 2000;
+    if (yearIndex < 0 || yearIndex >= BSMonths.length) throw new Error('Year data not available for: ' + year);
+    var maxDay = BSMonths[yearIndex][month - 1];
+    if (day < 1 || day > maxDay) throw new Error('Day out of range for year ' + year + ' month ' + month + '. Max day is ' + maxDay + ' but got: ' + day);
+    return new DateBS(year, month, day);
+  };
 
-/**
- * converts the date in BS to date in AD
- **/
-DateBS.prototype.toAD = function () {
-  var startingDateAD = new Date('1944-01-01T00:00');
-  startingDateAD.setDate(1 + this.daysSince());
-  return startingDateAD;
-};
+  /**
+   * converts BS Date to string with zero-padded month and day
+   * @return {string} Date in YYYY-MM-DD format
+   **/
+  DateBS.prototype.toString = function () {
+    return this.year + '-' + String(this.month).padStart(2, '0') + '-' + String(this.day).padStart(2, '0');
+  };
 
-/**
- * converts the date in AD to date in BS
- * @static
- **/
-DateBS.fromAD = function (date) {
-  if (!date) date = new Date();
-  var startingDateAD = new Date('1944-01-01');
-  var diff = DateBS.daysDiff(date, startingDateAD);
-  var startingDateBS = new DateBS(2000, 9, 17);
-  startingDateBS.add(diff);
-  return startingDateBS;
-};
+  /**
+   * Format the date using a pattern string
+   * @param {string} pattern - Format pattern (YYYY=year, MM=month padded, M=month, DD=day padded, D=day, MMMM=month name, MMM=month name short, mmmm=nepali month)
+   * @return {string} Formatted date string
+   */
+  DateBS.prototype.format = function (pattern) {
+    if (!pattern) pattern = 'YYYY-MM-DD';
+    
+    var result = pattern;
+    result = result.replace(/YYYY/g, this.year);
+    result = result.replace(/YY/g, String(this.year).slice(-2));
+    result = result.replace(/MMMM/g, MONTH_NAMES_EN[this.month - 1]);
+    result = result.replace(/mmmm/g, MONTH_NAMES_NE[this.month - 1]);
+    result = result.replace(/MMM/g, MONTH_NAMES_EN[this.month - 1].slice(0, 3));
+    result = result.replace(/MM/g, String(this.month).padStart(2, '0'));
+    result = result.replace(/M(?![a-zA-Z])/g, this.month);
+    result = result.replace(/DD/g, String(this.day).padStart(2, '0'));
+    result = result.replace(/D(?![a-zA-Z])/g, this.day);
+    
+    // Weekday (requires conversion to AD first)
+    if (pattern.indexOf('dddd') !== -1 || pattern.indexOf('ddd') !== -1) {
+      var adDate = this.toAD();
+      var weekday = adDate.getDay();
+      result = result.replace(/dddd/g, WEEKDAY_NAMES_EN[weekday]);
+      result = result.replace(/ddd/g, WEEKDAY_NAMES_EN[weekday].slice(0, 3));
+    }
+    
+    return result;
+  };
 
-/**
- * get the number of days in between two days
- * @param {Date} a: first date
- * @param {Date} b: second date
- * @static
- **/
-DateBS.daysDiff = function (a, b) {
-  var before = new Date('2020-07-01');
-  var after = new Date('2020-07-02');
-  return Math.floor((a - b) / (after - before));
-};
+  /**
+   * get the day of the year
+   **/
+  DateBS.prototype.dayOfYear = function () {
+    var months = this.monthsInYear();
+    var sum = 0;
+    for (var i = 0; i < this.month - 1; i++) {
+      sum += months[i];
+    }
+    return sum + this.day;
+  };
 
-/**
- * get tge number of days in months of the year
- * @class DateBS
- */
-DateBS.prototype.monthsInYear = function () {
-  return DateBS.monthsInYear(this.year);
-};
+  /**
+   * get the day in year
+   * @class DateBS
+   **/
+  DateBS.prototype.daysInYear = function () {
+    return DateBS.daysInYear(this.year);
+  };
 
-/**
- * get the list of days in months of the year
- * @param {number} year: year in BS
- * @static
- **/
-DateBS.monthsInYear = function (year) {
-  var yearIndex = year - 2000;
-  if (yearIndex >= 0) {
-    return BSMonths[yearIndex];
-  }
-};
+  /**
+   * get the no of days in a year
+   * @param {number} year: number in year
+   * @static
+   **/
+  DateBS.daysInYear = function (year) {
+    var months = DateBS.monthsInYear(year);
+    var sum = 0;
+    for (var i = 0; i < months.length; i++) {
+      sum += months[i];
+    }
+    return sum;
+  };
 
-/**
- * get the list of days in month of the year
- **/
-DateBS.prototype.daysInMonth = function () {
-  return DateBS.daysInMonth(this.year, this.month);
-};
+  /**
+   * get number of days since specific day in BSMonths
+   * @param {DateBS} date: date in DateBS format which is by default 2000-9-17
+   **/
+  DateBS.prototype.daysSince = function (date) {
+    if (!date) date = new DateBS(2000, 9, 17);
+    var days = 0;
+    for (var year = date.year; year < this.year; year++) {
+      days += DateBS.daysInYear(year);
+    }
+    days = days + this.dayOfYear() - date.dayOfYear();
+    return days;
+  };
 
-/**
- * get the day in the specific month
- * @param {number} year: year in BS
- * @param {number} month: month in BS
- * @static
- **/
-DateBS.daysInMonth = function (year, month) {
-  return DateBS.monthsInYear(year)[month - 1];
-};
+  /**
+   * get the date in BS greater than specific day, month and year
+   * @param {number} day: no of days to add
+   * @param {number} month: no of months to add
+   * @param {number} year: no of years to add
+   **/
+  DateBS.prototype.add = function (day, month, year) {
+    if (!month) month = 0;
+    if (!year) year = 0;
+    this.month += month;
+    this.year += year + Math.floor(this.month / 12);
+    this.month = this.month % 12;
+    var diff = day;
+    while (diff > 0) {
+      var daysInMonth = this.daysInMonth();
+      var daysLeft = daysInMonth - this.day + 1;
+      if (diff >= daysLeft) {
+        if (this.month === 12) {
+          this.year += 1;
+          this.month = 1;
+          this.day = 1;
+        } else {
+          this.month += 1;
+          this.day = 1;
+        }
+        diff -= daysLeft;
+      } else {
+        this.day += diff;
+        diff -= diff;
+      }
+    }
+    return this;
+  };
 
-/**
- * converts the month to string
- **/
-DateBS.prototype.monthInString = function () {
-  var monthBS = ['Baishakh', 'Jestha', 'Ashadh', 'Shrawan', 'Bhadra', 'Ashwin', 'Kartik', 'Mangsir', 'Poush', 'Magh', 'Falgun', 'Chaitra'];
-  return monthBS[this.month - 1];
-};
+  /**
+   * converts the date in BS to date in AD
+   * @return {Date} JavaScript Date object in AD
+   **/
+  DateBS.prototype.toAD = function () {
+    // Use local time constructor to avoid timezone issues
+    var startingDateAD = new Date(1944, 0, 1); // January 1, 1944 local time
+    startingDateAD.setDate(1 + this.daysSince());
+    return startingDateAD;
+  };
 
-/**
- * converts the month to nepali string
- **/
-DateBS.prototype.monthInStringNepali = function () {
-  var monthBS = ['वैशाख', 'ज्येष्ठ', 'असार', 'साउन', 'भदौ', 'असोज', 'कात्तिक', 'मंसिर', 'पुष', 'माघ', 'फागुन', 'चैत'];
-  return monthBS[this.month - 1];
-};
+  /**
+   * converts the date in AD to date in BS
+   * @param {Date} [date] - JavaScript Date object (defaults to today)
+   * @return {DateBS} DateBS object
+   * @static
+   **/
+  DateBS.fromAD = function (date) {
+    if (!date) date = new Date();
+    // Normalize to local midnight to avoid timezone issues
+    var normalizedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    var startingDateAD = new Date(1944, 0, 1); // January 1, 1944 local time
+    var diff = DateBS.daysDiff(normalizedDate, startingDateAD);
+    var startingDateBS = new DateBS(2000, 9, 17);
+    startingDateBS.add(diff);
+    return startingDateBS;
+  };
 
-/**
- * get the financial year
- **/
-DateBS.prototype.financialYear = function () {
-  if (this.month > 3) {
-    return this.year + '/' + ((this.year % 100) + 1);
-  } else {
-    return this.year - 1 + '/' + (this.year % 100);
-  }
-};
+  /**
+   * get the number of days in between two days
+   * @param {Date} a: first date
+   * @param {Date} b: second date
+   * @static
+   **/
+  DateBS.daysDiff = function (a, b) {
+    var msPerDay = 24 * 60 * 60 * 1000;
+    return Math.floor((a - b) / msPerDay);
+  };
+
+  /**
+   * get tge number of days in months of the year
+   * @class DateBS
+   */
+  DateBS.prototype.monthsInYear = function () {
+    return DateBS.monthsInYear(this.year);
+  };
+
+  /**
+   * get the list of days in months of the year
+   * @param {number} year: year in BS
+   * @static
+   **/
+  DateBS.monthsInYear = function (year) {
+    var yearIndex = year - 2000;
+    if (yearIndex >= 0) {
+      return BSMonths[yearIndex];
+    }
+  };
+
+  /**
+   * get the list of days in month of the year
+   **/
+  DateBS.prototype.daysInMonth = function () {
+    return DateBS.daysInMonth(this.year, this.month);
+  };
+
+  /**
+   * get the day in the specific month
+   * @param {number} year: year in BS
+   * @param {number} month: month in BS
+   * @static
+   **/
+  DateBS.daysInMonth = function (year, month) {
+    return DateBS.monthsInYear(year)[month - 1];
+  };
+
+  /**
+   * converts the month to string
+   * @return {string} English month name
+   **/
+  DateBS.prototype.monthInString = function () {
+    return MONTH_NAMES_EN[this.month - 1];
+  };
+
+  /**
+   * converts the month to nepali string
+   * @return {string} Nepali month name
+   **/
+  DateBS.prototype.monthInStringNepali = function () {
+    return MONTH_NAMES_NE[this.month - 1];
+  };
+
+  /**
+   * get the financial year
+   * @return {string} Financial year in format YYYY/YY
+   **/
+  DateBS.prototype.financialYear = function () {
+    if (this.month > 3) {
+      return this.year + '/' + ((this.year % 100) + 1);
+    } else {
+      return this.year - 1 + '/' + (this.year % 100);
+    }
+  };
+
+  /**
+   * Get the weekday name for this BS date
+   * @param {boolean} [nepali=false] - If true, returns Nepali weekday name
+   * @return {string} Weekday name
+   */
+  DateBS.prototype.getWeekday = function (nepali) {
+    var adDate = this.toAD();
+    var weekday = adDate.getDay();
+    return nepali ? WEEKDAY_NAMES_NE[weekday] : WEEKDAY_NAMES_EN[weekday];
+  };
+
+  /**
+   * Clone this DateBS object
+   * @return {DateBS} New DateBS object with same values
+   */
+  DateBS.prototype.clone = function () {
+    return new DateBS(this.year, this.month, this.day);
+  };
+
+  /**
+   * Compare two DateBS objects
+   * @param {DateBS} other - DateBS object to compare with
+   * @return {number} -1 if this < other, 0 if equal, 1 if this > other
+   */
+  DateBS.prototype.compare = function (other) {
+    if (this.year !== other.year) return this.year < other.year ? -1 : 1;
+    if (this.month !== other.month) return this.month < other.month ? -1 : 1;
+    if (this.day !== other.day) return this.day < other.day ? -1 : 1;
+    return 0;
+  };
+
+  /**
+   * Check if this date equals another DateBS
+   * @param {DateBS} other - DateBS object to compare with
+   * @return {boolean} True if dates are equal
+   */
+  DateBS.prototype.equals = function (other) {
+    return this.compare(other) === 0;
+  };
+
+  // Return the public API
+  return {
+    // Main conversion functions
+    BS_TO_AD: BS_TO_AD,
+    AD_TO_BS: AD_TO_BS,
+    
+    // DateBS class
+    DateBS: DateBS,
+    
+    // Helper functions
+    todayBS: todayBS,
+    isValidBS: isValidBS,
+    isValidAD: isValidAD,
+    
+    // Data
+    BSMonths: BSMonths,
+    MONTH_NAMES_EN: MONTH_NAMES_EN,
+    MONTH_NAMES_NE: MONTH_NAMES_NE,
+    WEEKDAY_NAMES_EN: WEEKDAY_NAMES_EN,
+    WEEKDAY_NAMES_NE: WEEKDAY_NAMES_NE,
+    
+    // Version
+    version: '2.0.0'
+  };
+}));
+
+// Test cases in terminal
+/*node -e "const N = require('./NepaliBStoAD.js'); console.log('Test 1: 2026-01-24 AD =', N.AD_TO_BS('2026-01-24'), 'BS (expected: 2082-10-10)'); console.log('Test 2: 2025-04-14 AD =', N.AD_TO_BS('2025-04-14'), 'BS (expected: 2082-01-01)'); console.log('Test 3: 2082-10-10 BS =', N.BS_TO_AD('2082-10-10'), 'AD (expected: 2026-01-24)'); console.log('Test 4: 2082-01-01 weekday:', N.DateBS.fromString('2082-01-01').getWeekday());" */
+// Expected output:
+// Test 1: 2026-01-24 AD = 2082-10-10 BS (expected: 2082-10-10)
+// Test 2: 2025-04-14 AD = 2082-01-01 BS (expected: 2082-01-01)
+// Test 3: 2082-10-10 BS = 2026-01-24 AD (expected: 2026-01-24)
+// Test 4: 2082-01-01 weekday: Monday
