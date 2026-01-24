@@ -1,34 +1,115 @@
-# BS to AD Date Converter
+# NepaliDate - BS ↔ AD Date Converter
 
-A JavaScript library for converting dates between Bikram Sambat (BS) and Anno Domini (AD) calendars, specifically designed for Google Sheets and general JavaScript applications.
+A universal JavaScript library for converting dates between Bikram Sambat (BS) and Anno Domini (AD) calendars. Works in **Google Sheets**, **Tampermonkey userscripts**, **Node.js**, and **browsers**.
+
+---
+
+**2026-01-24 / 2082-10-10 Correction:**
+> As of v2.0.1, the BSMonths data for year 2082 has been fixed: Baishakh (month 1) now correctly has 31 days. This ensures that:
+>
+> - 2026-01-24 AD ↔ 2082-10-10 BS
+> - 2025-04-14 AD ↔ 2082-01-01 BS (Monday)
+>
+> All conversions for these dates are now accurate.
+
+---
 
 ## Features
 
-- ✅ Convert BS dates to AD dates
-- ✅ Convert AD dates to BS dates
+- ✅ Convert BS dates to AD dates (`BS_TO_AD`)
+- ✅ Convert AD dates to BS dates (`AD_TO_BS`)
 - ✅ Support for multiple date formats
 - ✅ Comprehensive month name recognition (English & Nepali)
 - ✅ Google Sheets custom function integration
+- ✅ UMD module support (CommonJS, AMD, browser global)
+- ✅ Tampermonkey `@require` compatible
 - ✅ Robust error handling
+- ✅ Date formatting with custom patterns
+- ✅ Weekday support (English & Nepali)
 - ✅ Year range: 2000-2099 BS (1943-2042 AD)
+
+## Installation
+
+### Tampermonkey / Userscripts
+
+```javascript
+// @require https://raw.githubusercontent.com/kid4rm90s/NepaliBStoAD/main/NepaliBStoAD.js
+// @require https://kid4rm90s.github.io/NepaliBStoAD/NepaliBStoAD.js
+```
+
+Then access via `NepaliDate` global:
+
+```javascript
+const todayBS = NepaliDate.todayBS();
+const adDate = NepaliDate.BS_TO_AD('2082-10-10');
+const bsDate = NepaliDate.AD_TO_BS('2026-01-24');
+```
+
+### Node.js
+
+```javascript
+const NepaliDate = require('./NepaliBStoAD.js');
+// or ES modules
+import NepaliDate from './NepaliBStoAD.js';
+```
+
+### Browser (Script Tag)
+
+```html
+<script src="NepaliBStoAD.js"></script>
+<script>
+  const todayBS = NepaliDate.todayBS();
+  console.log(todayBS); // "2082-10-10"
+</script>
+```
+
+### Google Sheets
+
+1. Open Google Sheets → Extensions → Apps Script
+2. Paste the entire script
+3. Save and authorize
+4. Use `=BS_TO_AD(A1)` or `=AD_TO_BS(A1)` in cells
+
+## Quick Start
+
+```javascript
+// BS → AD conversion
+NepaliDate.BS_TO_AD('2082-10-10');           // "2026-01-24"
+NepaliDate.BS_TO_AD('2082 Magh 11');          // "2026-01-25"
+NepaliDate.BS_TO_AD('2082 माघ 11');           // "2026-01-25"
+
+// AD → BS conversion
+NepaliDate.AD_TO_BS('2026-01-24');           // "2082-10-10"
+NepaliDate.AD_TO_BS(new Date());              // Today in BS
+
+// Get today in BS
+NepaliDate.todayBS();                         // "2082-10-10"
+
+// Validation
+NepaliDate.isValidBS('2082-10-10');          // true
+NepaliDate.isValidBS('2082-13-01');          // false (invalid month)
+
+// Using DateBS class directly
+const bs = new NepaliDate.DateBS(2082, 10, 10);
+bs.toAD();                                    // Date object
+bs.format('YYYY MMMM DD');                   // "2082 Magh 10"
+bs.format('YYYY mmmm DD');                   // "2082 माघ 10"
+bs.getWeekday();                             // "Friday"
+bs.getWeekday(true);                         // "शुक्रबार"
+```
 
 ## Supported Date Formats
 
 ### Input Formats
-1. **Standard Format**: `YYYY-MM-DD`
-   - Example: `"2048-09-14"`
-
-2. **Named Month Format**: `YYYY MonthName DD`
-   - Example: `"2048 Poush 14"`
-
-3. **Nepali Month Names**: `YYYY नेपाली_महिना DD`
-   - Example: `"2048 पुष 14"`
-
-4. **8-digit Number Format**: `YYYYMMDD`
-   - Example: `20480914`
-
-5. **Date Objects**: JavaScript Date objects
-   - Automatically handled
+| Format | Example | Description |
+|--------|---------|-------------|
+| `YYYY-MM-DD` | `"2082-10-10"` | Standard format |
+| `YYYY/MM/DD` | `"2082/10/11"` | Slash separator |
+| `YYYY.MM.DD` | `"2082.10.11"` | Dot separator |
+| `YYYY MonthName DD` | `"2082 Magh 11"` | Named month (English) |
+| `YYYY नेपाली_महिना DD` | `"2082 माघ 11"` | Named month (Nepali) |
+| `YYYYMMDD` | `20821011` | 8-digit number |
+| Date object | `new Date()` | JavaScript Date |
 
 ### Supported Month Names
 
@@ -47,196 +128,230 @@ A JavaScript library for converting dates between Bikram Sambat (BS) and Anno Do
 | 11 | Falgun | फागुन | फाल्गुन, Phalgun |
 | 12 | Chaitra | चैत | चैत्र |
 
-## Usage
-
-### Google Sheets Custom Function
-
-```javascript
-=BS_TO_AD("2048-09-14")        // Returns: 1991-12-29
-=BS_TO_AD("2048 Poush 14")     // Returns: 1991-12-29  
-=BS_TO_AD("2048 पुष 14")       // Returns: 1991-12-29
-```
-
-### JavaScript Library
-
-```javascript
-// Create BS date from string
-var bsDate = DateBS.fromString("2048-09-14");
-var bsDate2 = DateBS.fromString("2048 Poush 14");
-
-// Convert to AD
-var adDate = bsDate.toAD();
-console.log(adDate); // JavaScript Date object
-
-// Create BS date from AD
-var todayBS = DateBS.fromAD(new Date());
-
-// Get formatted string
-console.log(bsDate.toString()); // "2048-9-14"
-
-// Get month in English/Nepali
-console.log(bsDate.monthInString());       // "Poush"
-console.log(bsDate.monthInStringNepali()); // "पुष"
-
-// Get financial year
-console.log(bsDate.financialYear()); // "2048/49"
-
-// Get days in month/year
-console.log(bsDate.daysInMonth()); // 30
-console.log(bsDate.daysInYear());  // 365
-```
-
 ## API Reference
 
-### Main Function
+### Conversion Functions
 
 #### `BS_TO_AD(bsDate)`
-Google Sheets custom function to convert BS date to AD date.
+Converts BS date to AD date string.
+
+```javascript
+NepaliDate.BS_TO_AD('2082-10-10');           // "2026-01-24"
+NepaliDate.BS_TO_AD('2082 Magh 11');          // "2026-01-24"
+```
 
 **Parameters:**
 - `bsDate` (string|number|Date): BS date in any supported format
 
-**Returns:**
-- String in YYYY-MM-DD format or error message
+**Returns:** String in `YYYY-MM-DD` format or error message
+
+---
+
+#### `AD_TO_BS(adDate, asObject)`
+Converts AD date to BS date.
+
+```javascript
+NepaliDate.AD_TO_BS('2026-01-24');           // "2082-10-10"
+NepaliDate.AD_TO_BS(new Date());              // Today in BS
+NepaliDate.AD_TO_BS('2026-01-24', true);     // DateBS object
+```
+
+**Parameters:**
+- `adDate` (string|Date|number): AD date (YYYY-MM-DD, Date object, or Google Sheets serial)
+- `asObject` (boolean, optional): If true, returns DateBS object instead of string
+
+**Returns:** String in `YYYY-MM-DD` format, DateBS object, or error message
+
+---
+
+### Helper Functions
+
+#### `todayBS(asObject)`
+Returns today's date in BS.
+
+```javascript
+NepaliDate.todayBS();        // "2082-10-10"
+NepaliDate.todayBS(true);    // DateBS object
+```
+
+---
+
+#### `isValidBS(bsDate)`
+Validates a BS date without throwing errors.
+
+```javascript
+NepaliDate.isValidBS('2082-10-10');  // true
+NepaliDate.isValidBS('2082-13-01');  // false
+NepaliDate.isValidBS('2100-01-01');  // false (out of range)
+```
+
+---
+
+#### `isValidAD(adDate)`
+Validates an AD date for conversion to BS.
+
+```javascript
+NepaliDate.isValidAD('2026-01-24');  // true
+NepaliDate.isValidAD('1900-01-01');  // false (before supported range)
+```
+
+---
 
 ### DateBS Class
 
 #### Constructor
 ```javascript
-new DateBS(year, month, day)
+const bs = new NepaliDate.DateBS(2082, 10, 11);
 ```
 
 #### Static Methods
 
-##### `DateBS.fromString(datestring)`
-Creates DateBS object from string.
-
-##### `DateBS.fromAD(date)`
-Creates DateBS object from AD Date object.
-
-##### `DateBS.daysInYear(year)`
-Returns total days in given BS year.
-
-##### `DateBS.daysInMonth(year, month)`
-Returns days in given BS month and year.
-
-##### `DateBS.monthsInYear(year)`
-Returns array of days in each month for given year.
+| Method | Description | Example |
+|--------|-------------|---------|
+| `DateBS.fromString(str)` | Create from string | `DateBS.fromString('2082-10-10')` |
+| `DateBS.fromAD(date)` | Create from AD Date | `DateBS.fromAD(new Date())` |
+| `DateBS.daysInYear(year)` | Days in BS year | `DateBS.daysInYear(2082)` → `365` |
+| `DateBS.daysInMonth(year, month)` | Days in month | `DateBS.daysInMonth(2082, 10)` → `29` |
+| `DateBS.monthsInYear(year)` | Array of days per month | `DateBS.monthsInYear(2082)` |
 
 #### Instance Methods
 
-##### `toAD()`
-Converts BS date to AD Date object.
+| Method | Description | Example |
+|--------|-------------|---------|
+| `toAD()` | Convert to AD Date object | `bs.toAD()` |
+| `toString()` | Get as `YYYY-MM-DD` string | `bs.toString()` → `"2082-10-10"` |
+| `format(pattern)` | Custom formatting | See format patterns below |
+| `dayOfYear()` | Day number in year | `bs.dayOfYear()` → `284` |
+| `daysInYear()` | Total days in year | `bs.daysInYear()` → `365` |
+| `daysInMonth()` | Days in current month | `bs.daysInMonth()` → `29` |
+| `monthInString()` | Month name (English) | `bs.monthInString()` → `"Magh"` |
+| `monthInStringNepali()` | Month name (Nepali) | `bs.monthInStringNepali()` → `"माघ"` |
+| `financialYear()` | Nepali fiscal year | `bs.financialYear()` → `"2082/83"` |
+| `getWeekday(nepali)` | Weekday name | `bs.getWeekday()` → `"Friday"` |
+| `add(days, months, years)` | Add time to date | `bs.add(5, 0, 0)` |
+| `clone()` | Create a copy | `bs.clone()` |
+| `compare(other)` | Compare dates | `bs.compare(other)` → `-1`, `0`, or `1` |
+| `equals(other)` | Check equality | `bs.equals(other)` → `true`/`false` |
 
-##### `toString()`
-Returns BS date as "YYYY-M-D" string.
+#### Format Patterns
 
-##### `dayOfYear()`
-Returns day number in the year (1-365/366).
+```javascript
+const bs = new NepaliDate.DateBS(2082, 10, 10);
 
-##### `daysInYear()`
-Returns total days in the year.
+bs.format('YYYY-MM-DD');      // "2082-10-10"
+bs.format('YYYY/M/D');        // "2082/10/10"
+bs.format('YYYY MMMM DD');    // "2082 Magh 10"
+bs.format('YYYY mmmm DD');    // "2082 माघ 10"
+bs.format('MMM DD, YYYY');    // "Mag 10, 2082"
+bs.format('dddd, MMMM D');    // "Saturday, Magh 10"
+```
 
-##### `daysInMonth()`
-Returns days in the month.
+| Token | Description | Example |
+|-------|-------------|---------|
+| `YYYY` | 4-digit year | `2082` |
+| `YY` | 2-digit year | `82` |
+| `MMMM` | Month name (English) | `Magh` |
+| `mmmm` | Month name (Nepali) | `माघ` |
+| `MMM` | Month name short | `Mag` |
+| `MM` | Month (2-digit) | `10` |
+| `M` | Month (1 or 2 digit) | `10` |
+| `DD` | Day (2-digit) | `10` |
+| `D` | Day (1 or 2 digit) | `10` |
+| `dddd` | Weekday (English) | `Saturday` |
+| `ddd` | Weekday short | `Sat` |
 
-##### `monthInString()`
-Returns month name in English.
+---
 
-##### `monthInStringNepali()`
-Returns month name in Nepali.
+### Data Constants
 
-##### `financialYear()`
-Returns financial year string (e.g., "2048/49").
+```javascript
+NepaliDate.BSMonths;          // 2D array of days per month (100 years)
+NepaliDate.MONTH_NAMES_EN;    // ['Baishakh', 'Jestha', ...]
+NepaliDate.MONTH_NAMES_NE;    // ['वैशाख', 'ज्येष्ठ', ...]
+NepaliDate.WEEKDAY_NAMES_EN;  // ['Sunday', 'Monday', ...]
+NepaliDate.WEEKDAY_NAMES_NE;  // ['आइतबार', 'सोमबार', ...]
+NepaliDate.version;           // '2.0.0'
+```
 
-##### `add(days, months, years)`
-Adds specified time to the date.
+## Google Sheets Usage
 
-##### `daysSince(date)`
-Returns days since given date (default: 2000-9-17).
+### Custom Functions
+```
+=BS_TO_AD("2082-10-10")        → 2026-01-24
+=BS_TO_AD("2082 Magh 11")      → 2026-01-24
+=BS_TO_AD(A1)                   → Converts date in cell A1
 
-## Error Handling
-
-The library provides descriptive error messages for various scenarios:
-
-- **Invalid format**: "Invalid BS date format. Expected YYYY-MM-DD or 'YYYY MonthName DD'"
-- **Unknown month**: "Unknown month name: 'xyz'. Supported formats: YYYY-MM-DD or 'YYYY MonthName DD'"
-- **Year out of range**: "Year out of supported range (2000-2099 BS). Got: 2150"
-- **Invalid month**: "Month out of range (1-12). Got: 13"
-- **Invalid day**: "Day out of range for year 2048 month 9. Max day is 30 but got: 31"
-
-## Google Sheets Integration
+=AD_TO_BS("2026-01-24")        → 2082-10-10
+=AD_TO_BS(TODAY())             → Today's date in BS
+=AD_TO_BS(A1)                   → Converts AD date in cell A1
+```
 
 ### Installation
 1. Open Google Sheets
-2. Go to Extensions → Apps Script
-3. Paste the entire script
-4. Save and authorize
+2. Go to **Extensions → Apps Script**
+3. Delete any existing code
+4. Paste the entire `NepaliBStoAD.js` content
+5. Click **Save** (💾)
+6. Return to spreadsheet and use `=BS_TO_AD()` or `=AD_TO_BS()`
 
-### Usage in Sheets
-- Use `=BS_TO_AD(A1)` where A1 contains a BS date
-- Handles Google Sheets error values gracefully
-- Returns empty string for invalid inputs
-- Supports cell references, direct strings, and formulas
+## Error Handling
+
+The library provides descriptive error messages:
+
+| Error | Message |
+|-------|---------|
+| Invalid format | `"Invalid BS date format. Expected YYYY-MM-DD or 'YYYY MonthName DD'"` |
+| Unknown month | `"Unknown month name: 'xyz'"` |
+| Year out of range | `"Year out of supported range (2000-2099 BS). Got: 2150"` |
+| Invalid month | `"Month out of range (1-12). Got: 13"` |
+| Invalid day | `"Day out of range for year 2082 month 10. Max day is 29 but got: 31"` |
 
 ## Technical Details
 
 ### Calendar Data
-- Supports BS years 2000-2099 (100 years)
-- Uses accurate month-day mappings for each year
-- Reference point: BS 2000-9-17 = AD 1944-1-1
+- Supports BS years **2000-2099** (100 years)
+- Accurate month-day mappings for each year
+- Reference point: BS 2000-9-17 = AD 1944-01-01
 
 ### Algorithm
 - Day-counting algorithm for accurate conversion
 - Handles leap years and variable month lengths
 - Accounts for BS calendar irregularities
 
-## Examples
-
-```javascript
-// Various input formats
-BS_TO_AD("2081-1-1")           // "2024-04-13"
-BS_TO_AD("2081 Baishakh 1")    // "2024-04-13"
-BS_TO_AD("2081 वैशाख 1")       // "2024-04-13"
-BS_TO_AD(20810101)             // "2024-04-13"
-
-// Error cases
-BS_TO_AD("2081-13-1")          // "Month out of range (1-12). Got: 13"
-BS_TO_AD("2081 Unknown 1")     // "Unknown month name: 'Unknown'..."
-BS_TO_AD("1999-1-1")           // "Year out of supported range..."
-```
-
 ## Changelog
 
-### Version 2.0
-- ✅ Added support for named month formats
-- ✅ Added Nepali month name recognition
-- ✅ Improved error handling
-- ✅ Enhanced Google Sheets integration
-- ✅ Added comprehensive validation
+### Version 2.0.1
+- 🐞 Fixed: 2082 Baishakh now has 31 days (was 30)
+- ✅ 2026-01-24 AD ↔ 2082-10-10 BS is now correct
+- ✅ 2025-04-14 AD ↔ 2082-01-01 BS (Monday) is now correct
 
-### Version 1.0
+### Version 2.0.0
+- ✅ Added `AD_TO_BS()` conversion function
+- ✅ Added UMD module support (Node.js, AMD, browser)
+- ✅ Added Tampermonkey `@require` support
+- ✅ Added `todayBS()` helper function
+- ✅ Added `isValidBS()` and `isValidAD()` validators
+- ✅ Added `format()` method with pattern support
+- ✅ Added weekday support (English & Nepali)
+- ✅ Added `clone()`, `compare()`, `equals()` methods
+- ✅ Fixed `toString()` to return zero-padded format (YYYY-MM-DD)
+- ✅ Added `NepaliDate` global namespace
+- ✅ Maintained full backward compatibility with Google Sheets
+
+### Version 1.x
 - ✅ Basic BS to AD conversion
-- ✅ YYYY-MM-DD format support
+- ✅ Named month formats support
+- ✅ Nepali month name recognition
 - ✅ Google Sheets custom function
 
 ## License
 
-This project is open source and available under the MIT License.
+MIT License - feel free to use in your projects.
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit pull requests or open issues for:
+Contributions welcome! Feel free to submit PRs for:
 - Bug fixes
-- Feature enhancements
-- Documentation improvements
+- Extended year range
 - Additional month name variants
-- Extended year range support
-
-## Support
-
-For issues or questions:
-1. Check the error message for specific guidance
-2. Verify date format matches supported patterns
-3. Ensure year is within 2000-2099 BS range
-4. Confirm month names are spelled correctly
+- Documentation improvements
