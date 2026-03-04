@@ -2,7 +2,7 @@
  * NepaliDate - Nepali (Bikram Sambat) Date Conversion Library
  * Converts dates between BS (Bikram Sambat) and AD (Anno Domini)
  * 
- * @version 2.0.1
+ * @version 2.1.0
  * @license MIT
  * 
  * Usage:
@@ -658,49 +658,55 @@
    * Format: { bsDate: 'YYYY-MM-DD', adDate: 'YYYY-MM-DD', nameEng: 'Holiday Name (English)', nameNep: 'Holiday Name (Nepali)', type: 'national|religious|observance' }
    */
   var HOLIDAYS_DB = [
-    // 2081 BS Holidays (2024-2025 AD)
-    { bsDate: '2081-09-19', adDate: '2024-12-31', nameEng: 'New Year\'s Eve', nameNep: 'नव वर्षको पूर्वसन्ध्या', type: 'observance' },
-    { bsDate: '2081-10-20', adDate: '2025-01-30', nameEng: 'Republic Day', nameNep: 'गणतन्त्र दिवस', type: 'national' },
-    { bsDate: '2081-11-09', adDate: '2025-02-18', nameEng: 'Maha Shivaratri', nameNep: 'महा शिवरात्री', type: 'religious' },
-    { bsDate: '2081-11-27', adDate: '2025-03-08', nameEng: 'International Women\'s Day', nameNep: 'अन्तर्राष्ट्रिय महिला दिवस', type: 'observance' },
-    { bsDate: '2081-12-19', adDate: '2025-03-30', nameEng: 'Holi (Fagu Purnima)', nameNep: 'होली (फागु पूर्णिमा)', type: 'religious' },
-    { bsDate: '2082-01-01', adDate: '2025-04-14', nameEng: 'Nepali New Year', nameNep: 'नेपाली नववर्ष', type: 'national' },
-    { bsDate: '2082-01-14', adDate: '2025-04-27', nameEng: 'Ram Navami', nameNep: 'राम नवमी', type: 'religious' },
-    { bsDate: '2082-02-21', adDate: '2025-06-03', nameEng: 'Buddha Jayanti', nameNep: 'बुद्ध जयन्ती', type: 'national' },
-    { bsDate: '2082-04-06', adDate: '2025-07-19', nameEng: 'Eid ul-Adha (Bakrid)', nameNep: 'ईद (बकरीद)', type: 'religious' },
-    { bsDate: '2082-05-07', adDate: '2025-08-18', nameEng: 'Janai Purnima', nameNep: 'जनै पूर्णिमा', type: 'religious' },
-    { bsDate: '2082-05-08', adDate: '2025-08-19', nameEng: 'Rishi Panchami', nameNep: 'ऋषि पञ्चमी', type: 'religious' },
-    { bsDate: '2082-06-15', adDate: '2025-09-25', nameEng: 'Ghatasthapana (Dashain begins)', nameNep: 'घटस्थापना (दशैंको शुरुवात)', type: 'religious' },
-    { bsDate: '2082-06-25', adDate: '2025-10-05', nameEng: 'Vijaya Dasami (Dashain)', nameNep: 'विजयदशमी (दशैं)', type: 'national' },
-    { bsDate: '2082-07-01', adDate: '2025-10-11', nameEng: 'Tihar (Deepawali)', nameNep: 'तिहार (दिवाली)', type: 'national' },
-    { bsDate: '2082-07-16', adDate: '2025-10-26', nameEng: 'Govardhan Puja', nameNep: 'गोवर्धन पूजा', type: 'religious' },
-    { bsDate: '2082-07-17', adDate: '2025-10-27', nameEng: 'Bhai Tika (Tihar)', nameNep: 'भाइ टीका (तिहार)', type: 'religious' },
-    { bsDate: '2082-08-15', adDate: '2025-11-24', nameEng: 'Chhath Puja', nameNep: 'छठ पूजा', type: 'religious' },
-    { bsDate: '2082-09-21', adDate: '2025-12-31', nameEng: 'New Year\'s Eve', nameNep: 'नव वर्षको पूर्वसन्ध्या', type: 'observance' },
-
-    // 2083 BS Holidays (2026-2027 AD)
-    { bsDate: '2083-10-20', adDate: '2026-01-30', nameEng: 'Republic Day', nameNep: 'गणतन्त्र दिवस', type: 'national' },
-    { bsDate: '2083-10-28', adDate: '2026-02-07', nameEng: 'Maha Shivaratri', nameNep: 'महा शिवरात्री', type: 'religious' },
-    { bsDate: '2083-11-27', adDate: '2026-03-08', nameEng: 'International Women\'s Day', nameNep: 'अन्तर्राष्ट्रिय महिला दिवस', type: 'observance' },
-    { bsDate: '2083-12-07', adDate: '2026-03-18', nameEng: 'Holi (Fagu Purnima)', nameNep: 'होली (फागु पूर्णिमा)', type: 'religious' },
-    { bsDate: '2084-01-01', adDate: '2026-04-14', nameEng: 'Nepali New Year', nameNep: 'नेपाली नववर्ष', type: 'national' },
-    { bsDate: '2084-01-03', adDate: '2026-04-16', nameEng: 'Ram Navami', nameNep: 'राम नवमी', type: 'religious' },
-    { bsDate: '2084-02-11', adDate: '2026-05-23', nameEng: 'Buddha Jayanti', nameNep: 'बुद्ध जयन्ती', type: 'national' },
-    { bsDate: '2084-03-27', adDate: '2026-07-08', nameEng: 'Eid ul-Adha (Bakrid)', nameNep: 'ईद (बकरीद)', type: 'religious' },
-    { bsDate: '2084-04-26', adDate: '2026-08-07', nameEng: 'Janai Purnima', nameNep: 'जनै पूर्णिमा', type: 'religious' },
-    { bsDate: '2084-04-27', adDate: '2026-08-08', nameEng: 'Rishi Panchami', nameNep: 'ऋषि पञ्चमी', type: 'religious' },
-    { bsDate: '2084-06-04', adDate: '2026-09-14', nameEng: 'Ghatasthapana (Dashain begins)', nameNep: 'घटस्थापना (दशैंको शुरुवात)', type: 'religious' },
-    { bsDate: '2084-06-14', adDate: '2026-09-24', nameEng: 'Vijaya Dasami (Dashain)', nameNep: 'विजयदशमी (दशैं)', type: 'national' },
-    { bsDate: '2084-06-20', adDate: '2026-09-30', nameEng: 'Tihar (Deepawali)', nameNep: 'तिहार (दिवाली)', type: 'national' },
-    { bsDate: '2084-07-05', adDate: '2026-10-15', nameEng: 'Govardhan Puja', nameNep: 'गोवर्धन पूजा', type: 'religious' },
-    { bsDate: '2084-07-06', adDate: '2026-10-16', nameEng: 'Bhai Tika (Tihar)', nameNep: 'भाइ टीका (तिहार)', type: 'religious' },
-    { bsDate: '2084-08-04', adDate: '2026-11-14', nameEng: 'Chhath Puja', nameNep: 'छठ पूजा', type: 'religious' },
-    { bsDate: '2084-09-21', adDate: '2026-12-31', nameEng: 'New Year\'s Eve', nameNep: 'नव वर्षको पूर्वसन्ध्या', type: 'observance' },
-
-    // 2085 BS Holidays (2028-2029 AD)
-    { bsDate: '2085-10-20', adDate: '2029-01-30', nameEng: 'Republic Day', nameNep: 'गणतन्त्र दिवस', type: 'national' },
-    { bsDate: '2085-11-17', adDate: '2029-02-27', nameEng: 'Maha Shivaratri', nameNep: 'महा शिवरात्री', type: 'religious' },
-    { bsDate: '2085-11-27', adDate: '2029-03-08', nameEng: 'International Women\'s Day', nameNep: 'अन्तर्राष्ट्रिय महिला दिवस', type: 'observance' },
+    // 2082 BS Holidays (2025-2026 AD)
+    { bsDate: '2082-01-01', adDate: '2025-04-14', nameEng: 'Nepali New Year (Navabarsha)', nameNep: 'नव वर्ष २०८२', type: 'national' },
+    { bsDate: '2082-01-18', adDate: '2025-05-01', nameEng: 'Labour Day', nameNep: 'श्रमिक दिवस', type: 'national' },
+    { bsDate: '2082-01-29', adDate: '2025-05-12', nameEng: 'Buddha Jayanti', nameNep: 'बुद्ध जयन्ती', type: 'national' },
+    { bsDate: '2082-01-29', adDate: '2025-05-12', nameEng: 'Ubhauli Festival', nameNep: 'उभौली पर्व', type: 'religious' },
+    { bsDate: '2082-02-15', adDate: '2025-05-29', nameEng: 'Republic Day', nameNep: 'राष्ट्रिय गणतन्त्र दिवस', type: 'national' },
+    { bsDate: '2082-02-18', adDate: '2025-06-01', nameEng: 'Bhoto Jatra (Kathmandu Valley only)', nameNep: 'भोटो जात्रा (काठमाडौं उपत्यका मात्र)', type: 'religious' },
+    { bsDate: '2082-02-24', adDate: '2025-06-07', nameEng: 'Eid ul-Adha', nameNep: 'ईद अल-अधा', type: 'religious' },
+    { bsDate: '2082-04-24', adDate: '2025-08-09', nameEng: 'Rakshya Bandhan', nameNep: 'रक्षाबन्धन', type: 'religious' },
+    { bsDate: '2082-04-31', adDate: '2025-08-16', nameEng: 'Shri Krishna Janmashtami', nameNep: 'श्रीकृष्ण जन्माष्टमी व्रत', type: 'religious' },
+    { bsDate: '2082-05-10', adDate: '2025-08-26', nameEng: 'Hartalika Teej (Women only)', nameNep: 'हरितालिका (तीज) व्रत (महिला मात्र)', type: 'religious' },
+    { bsDate: '2082-05-15', adDate: '2025-08-31', nameEng: 'Gora Purnima', nameNep: 'गौरापर्व', type: 'religious' },
+    { bsDate: '2082-05-21', adDate: '2025-09-06', nameEng: 'Indra Jatra', nameNep: 'इन्द्रजात्रा (स्वाँछ्या)', type: 'religious' },
+    { bsDate: '2082-05-30', adDate: '2025-09-15', nameEng: 'Jivatputrika (Jitiya)', nameNep: 'जीवतपुतृका ब्रत (जितियापर्व)', type: 'religious' },
+    { bsDate: '2082-06-03', adDate: '2025-09-19', nameEng: 'Constitution Day', nameNep: 'संविधान दिवस', type: 'national' },
+    { bsDate: '2082-06-06', adDate: '2025-09-22', nameEng: 'Ghatasthapana (Dashain begins)', nameNep: 'घटस्थापना (न:ला स्वने)', type: 'religious' },
+    { bsDate: '2082-06-13', adDate: '2025-09-29', nameEng: 'Phulpati', nameNep: 'फूलपाती', type: 'religious' },
+    { bsDate: '2082-06-14', adDate: '2025-09-30', nameEng: 'Maha Ashtami', nameNep: 'महाष्टमी व्रत', type: 'religious' },
+    { bsDate: '2082-06-15', adDate: '2025-10-01', nameEng: 'Maha Navami', nameNep: 'महानवमी', type: 'religious' },
+    { bsDate: '2082-06-16', adDate: '2025-10-02', nameEng: 'Vijaya Dasami (Dashain Tika)', nameNep: 'विजया दशमी (दशैको टिका)', type: 'national' },
+    { bsDate: '2082-06-17', adDate: '2025-10-03', nameEng: 'Annapurna Jatra', nameNep: 'अन्नपूर्णयात्रा/असंचालं', type: 'religious' },
+    { bsDate: '2082-07-03', adDate: '2025-10-20', nameEng: 'Diwali (Lakshmi Puja)', nameNep: 'दीपावली (लक्ष्मी पूजा)', type: 'national' },
+    { bsDate: '2082-07-04', adDate: '2025-10-21', nameEng: 'Darshan Shraddha', nameNep: 'दर्शश्राद्ध', type: 'religious' },
+    { bsDate: '2082-07-05', adDate: '2025-10-22', nameEng: 'Cow Tihar', nameNep: 'गाई तिहार', type: 'religious' },
+    { bsDate: '2082-07-06', adDate: '2025-10-23', nameEng: 'Bhai Tika', nameNep: 'भाइटीका (किजा पूजा)', type: 'religious' },
+    { bsDate: '2082-07-07', adDate: '2025-10-24', nameEng: 'World Information Development Day', nameNep: 'विश्व विकास सूचना दिवस', type: 'observance' },
+    { bsDate: '2082-07-10', adDate: '2025-10-27', nameEng: 'Chhath Puja', nameNep: 'छठपर्व', type: 'religious' },
+    { bsDate: '2082-07-19', adDate: '2025-11-05', nameEng: 'Guru Nanak Jayanti', nameNep: 'गुरु नानक जयन्ती (शिख धर्मावलम्बी)', type: 'religious' },
+    { bsDate: '2082-07-25', adDate: '2025-11-11', nameEng: 'Phalgunanda Jayanti', nameNep: 'फाल्गुनानन्द जयन्ती (किराँत धर्मावलम्बी मात्र)', type: 'religious' },
+    { bsDate: '2082-08-17', adDate: '2025-12-03', nameEng: 'International Day of Persons with Disabilities', nameNep: 'अन्तर्राष्ट्रिय अपाङ्गता दिवस', type: 'observance' },
+    { bsDate: '2082-08-18', adDate: '2025-12-04', nameEng: 'Udhali Festival', nameNep: 'उँधौली पर्व', type: 'religious' },
+    { bsDate: '2082-09-10', adDate: '2025-12-25', nameEng: 'Christmas', nameNep: 'क्रिसमस (इसाई धर्म मात्र)', type: 'religious' },
+    { bsDate: '2082-09-15', adDate: '2025-12-30', nameEng: 'Tamu Lhosar (Gurung New Year)', nameNep: 'तमु (गुरुङ) ल्होसार', type: 'religious' },
+    { bsDate: '2082-09-27', adDate: '2026-01-11', nameEng: 'Prithvi Jayanti', nameNep: 'पृथ्वी जयन्ती', type: 'observance' },
+    { bsDate: '2082-10-01', adDate: '2026-01-15', nameEng: 'Maaghe Sankranti', nameNep: 'माघे संक्रान्ति (घ्यौ:चाकु:सँन्हु)', type: 'religious' },
+    { bsDate: '2082-10-05', adDate: '2026-01-19', nameEng: 'Sonam Lhosar (Tamang New Year)', nameNep: 'सोनाम (तामाङ) ल्होसार', type: 'religious' },
+    { bsDate: '2082-10-09', adDate: '2026-01-23', nameEng: 'Saraswati Jayanti', nameNep: 'सरस्वती जयन्ती', type: 'religious' },
+    { bsDate: '2082-10-16', adDate: '2026-01-30', nameEng: 'Shahid Day (Martyrs Day)', nameNep: 'शहीद दिवस', type: 'national' },
+    { bsDate: '2082-11-03', adDate: '2026-02-15', nameEng: 'Maha Shivaratri', nameNep: 'महाशिवरात्रि व्रत', type: 'religious' },
+    { bsDate: '2082-11-06', adDate: '2026-02-18', nameEng: 'Gyalpo Lhosar (Bhutanese New Year)', nameNep: 'ग्याल्पो ल्होसार', type: 'religious' },
+    { bsDate: '2082-11-07', adDate: '2026-02-19', nameEng: 'National Democracy Day', nameNep: 'राष्ट्रिय प्रजातन्त्र दिवस', type: 'national' },
+    { bsDate: '2082-11-18', adDate: '2026-03-02', nameEng: 'Holi (Phagwa) - Hill Region', nameNep: 'पहाडमा होली', type: 'religious' },
+    { bsDate: '2082-11-19', adDate: '2026-03-03', nameEng: 'Holi (Phagwa) - Terai Region', nameNep: 'तराईमा होली', type: 'religious' },
+    { bsDate: '2082-11-20', adDate: '2026-03-04', nameEng: 'Election Holiday', nameNep: 'निर्वाचन बिदा, २०८२', type: 'observance' },
+    { bsDate: '2082-11-21', adDate: '2026-03-05', nameEng: 'Representative Assembly Election', nameNep: 'प्रतिनिधि सभा निर्वाचन, २०८२', type: 'observance' },
+    { bsDate: '2082-11-22', adDate: '2026-03-06', nameEng: 'Election Holiday', nameNep: 'निर्वाचन बिदा, २०८२', type: 'observance' },
+    { bsDate: '2082-11-24', adDate: '2026-03-08', nameEng: 'International Women\'s Day', nameNep: 'अन्तर्राष्ट्रिय नारी दिवस', type: 'observance' },
+    { bsDate: '2082-12-04', adDate: '2026-03-18', nameEng: 'Ghode Jatra (Kathmandu only)', nameNep: 'घोडेजात्रा (काठमाडौं मात्र)', type: 'religious' },
+    { bsDate: '2082-12-13', adDate: '2026-03-27', nameEng: 'Ram Navami', nameNep: 'रामनवमी ब्रत (रामजयन्ती)', type: 'religious' },
   ];
 
   /**
