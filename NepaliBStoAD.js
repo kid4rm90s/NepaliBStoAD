@@ -2,7 +2,7 @@
  * NepaliDate - Nepali (Bikram Sambat) Date Conversion Library
  * Converts dates between BS (Bikram Sambat) and AD (Anno Domini)
  * 
- * @version 2.1.3
+ * @version 2.1.4
  * @license MIT
  * 
  * Usage:
@@ -245,7 +245,7 @@
     [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30], // 2080
     [31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31], // 2081
     [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30], // 2082
-    [31, 31, 32, 31, 32, 30, 30, 29, 30, 29, 30, 30], // 2083
+    [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30], // 2083
     [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31], // 2084
     [31, 31, 31, 32, 31, 31, 30, 29, 30, 30, 29, 31], // 2085
     [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30], // 2086
@@ -1039,24 +1039,30 @@
 }));
 
 // Test cases in terminal
+// ✓ VERIFIED PASSING - Run these tests to verify functionality:
+
+// Test 1: Basic AD to BS conversions
 /*node -e "const N = require('./NepaliBStoAD.js'); console.log('Test 1: 2026-01-24 AD =', N.AD_TO_BS('2026-01-24'), 'BS (expected: 2082-10-10)'); console.log('Test 2: 2025-04-14 AD =', N.AD_TO_BS('2025-04-14'), 'BS (expected: 2082-01-01)'); console.log('Test 3: 2082-10-10 BS =', N.BS_TO_AD('2082-10-10'), 'AD (expected: 2026-01-24)'); console.log('Test 4: 2082-01-01 weekday:', N.DateBS.fromString('2082-01-01').getWeekday());" */
-// Expected output:
-// Test 1: 2026-01-24 AD = 2082-10-10 BS (expected: 2082-10-10)
-// Test 2: 2025-04-14 AD = 2082-01-01 BS (expected: 2082-01-01)
-// Test 3: 2082-10-10 BS = 2026-01-24 AD (expected: 2026-01-24)
-// Test 4: 2082-01-01 weekday: Monday
+// ✓ Expected output (VERIFIED):
+// Test 1: 2026-01-24 AD = 2082-10-10 BS (expected: 2082-10-10) ✓
+// Test 2: 2025-04-14 AD = 2082-01-01 BS (expected: 2082-01-01) ✓
+// Test 3: 2082-10-10 BS = 2026-01-24 AD (expected: 2026-01-24) ✓
+// Test 4: 2082-01-01 weekday: Monday ✓
 
+// Test 2: Date formatting with Nepali month names and weekdays
 //node -e "const N = require('./NepaliBStoAD.js'); const bs = N.AD_TO_BS('1992-03-22', true); console.log('AD 1992-03-22 =', bs.format('YYYY-MM-DD, mmmm DD, dddd'), bs.getWeekday(true));"
-//AD 1992-03-22 = 2048-12-09, चैत 09, Sunday आइतबार
+// ✓ Expected output (VERIFIED):
+// AD 1992-03-22 = 2048-12-09, चैत 09, Sunday आइतबार ✓
 
+// Test 3: Holiday functions
 /*
+const NepaliDate = require('./NepaliBStoAD.js');
 const holiday = NepaliDate.isHolidayBS('2082-01-01');
-// Returns: { nameEng: 'Nepali New Year', nameNep: 'नेपाली नववर्ष', ... }
+// ✓ Returns: { bsDate: '2082-01-01', adDate: '2025-04-14', nameEng: 'Nepali New Year (Navabarsha)', nameNep: 'नव वर्ष २०८२', type: 'national' }
 
-// Display both names
 console.log(NepaliDate.getHolidayDisplay('2082-01-01'));
-// Output: Nepali New Year (नेपाली नववर्ष) - 2082-01-01 BS / 2025-04-14 AD
+// ✓ Output: Nepali New Year (Navabarsha) (नव वर्ष २०८२) - 2082-01-01 BS / 2025-04-14 AD
 
-// Format with both names
-console.log(NepaliDate.formatHolidaysAsText(2082));
+console.log(NepaliDate.formatHolidaysAsText(2082).substring(0, 500));
+// ✓ Outputs formatted list of all holidays for BS year 2082 (48 holidays)
 */
