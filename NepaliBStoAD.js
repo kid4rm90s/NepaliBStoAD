@@ -2,7 +2,7 @@
  * NepaliDate - Nepali (Bikram Sambat) Date Conversion Library
  * Converts dates between BS (Bikram Sambat) and AD (Anno Domini)
  * 
- * @version 2.0.1
+ * @version 2.1.2
  * @license MIT
  * 
  * Usage:
@@ -649,6 +649,343 @@
     return this.compare(other) === 0;
   };
 
+  // ========================================
+  // NEPALI HOLIDAYS DATABASE & FUNCTIONS
+  // ========================================
+
+  /**
+   * Comprehensive list of Nepali holidays and observances
+   * Format: { bsDate: 'YYYY-MM-DD', adDate: 'YYYY-MM-DD', nameEng: 'Holiday Name (English)', nameNep: 'Holiday Name (Nepali)', type: 'national|religious|observance' }
+   */
+  var HOLIDAYS_DB = [
+    // 2082 BS Holidays (2025-2026 AD)
+    { bsDate: '2082-01-01', adDate: '2025-04-14', nameEng: 'Nepali New Year (Navabarsha)', nameNep: 'नव वर्ष २०८२', type: 'national' },
+    { bsDate: '2082-01-18', adDate: '2025-05-01', nameEng: 'Labour Day', nameNep: 'श्रमिक दिवस', type: 'national' },
+    { bsDate: '2082-01-29', adDate: '2025-05-12', nameEng: 'Buddha Jayanti', nameNep: 'बुद्ध जयन्ती', type: 'national' },
+    { bsDate: '2082-01-29', adDate: '2025-05-12', nameEng: 'Ubhauli Festival', nameNep: 'उभौली पर्व', type: 'religious' },
+    { bsDate: '2082-02-15', adDate: '2025-05-29', nameEng: 'Republic Day', nameNep: 'राष्ट्रिय गणतन्त्र दिवस', type: 'national' },
+    { bsDate: '2082-02-18', adDate: '2025-06-01', nameEng: 'Bhoto Jatra (Kathmandu Valley only)', nameNep: 'भोटो जात्रा (काठमाडौं उपत्यका मात्र)', type: 'religious' },
+    { bsDate: '2082-02-24', adDate: '2025-06-07', nameEng: 'Eid ul-Adha', nameNep: 'ईद अल-अधा', type: 'religious' },
+    { bsDate: '2082-04-24', adDate: '2025-08-09', nameEng: 'Rakshya Bandhan', nameNep: 'रक्षाबन्धन', type: 'religious' },
+    { bsDate: '2082-04-31', adDate: '2025-08-16', nameEng: 'Shri Krishna Janmashtami', nameNep: 'श्रीकृष्ण जन्माष्टमी व्रत', type: 'religious' },
+    { bsDate: '2082-05-10', adDate: '2025-08-26', nameEng: 'Hartalika Teej (Women only)', nameNep: 'हरितालिका (तीज) व्रत (महिला मात्र)', type: 'religious' },
+    { bsDate: '2082-05-15', adDate: '2025-08-31', nameEng: 'Gora Purnima', nameNep: 'गौरापर्व', type: 'religious' },
+    { bsDate: '2082-05-21', adDate: '2025-09-06', nameEng: 'Indra Jatra', nameNep: 'इन्द्रजात्रा (स्वाँछ्या)', type: 'religious' },
+    { bsDate: '2082-05-30', adDate: '2025-09-15', nameEng: 'Jivatputrika (Jitiya)', nameNep: 'जीवतपुतृका ब्रत (जितियापर्व)', type: 'religious' },
+    { bsDate: '2082-06-03', adDate: '2025-09-19', nameEng: 'Constitution Day', nameNep: 'संविधान दिवस', type: 'national' },
+    { bsDate: '2082-06-06', adDate: '2025-09-22', nameEng: 'Ghatasthapana (Dashain begins)', nameNep: 'घटस्थापना (न:ला स्वने)', type: 'religious' },
+    { bsDate: '2082-06-13', adDate: '2025-09-29', nameEng: 'Phulpati', nameNep: 'फूलपाती', type: 'religious' },
+    { bsDate: '2082-06-14', adDate: '2025-09-30', nameEng: 'Maha Ashtami', nameNep: 'महाष्टमी व्रत', type: 'religious' },
+    { bsDate: '2082-06-15', adDate: '2025-10-01', nameEng: 'Maha Navami', nameNep: 'महानवमी', type: 'religious' },
+    { bsDate: '2082-06-16', adDate: '2025-10-02', nameEng: 'Vijaya Dashami (Dashain Tika)', nameNep: 'विजया दशमी (दशैको टिका)', type: 'national' },
+    { bsDate: '2082-06-17', adDate: '2025-10-03', nameEng: 'Annapurna Jatra', nameNep: 'अन्नपूर्णयात्रा/असंचालं', type: 'religious' },
+    { bsDate: '2082-07-03', adDate: '2025-10-20', nameEng: 'Dipawali (Lakshmi Puja)', nameNep: 'दीपावली (लक्ष्मी पूजा)', type: 'national' },
+    { bsDate: '2082-07-04', adDate: '2025-10-21', nameEng: 'Darshan Shraddha', nameNep: 'दर्शश्राद्ध', type: 'religious' },
+    { bsDate: '2082-07-05', adDate: '2025-10-22', nameEng: 'Cow Tihar', nameNep: 'गाई तिहार', type: 'religious' },
+    { bsDate: '2082-07-06', adDate: '2025-10-23', nameEng: 'Bhai Tika', nameNep: 'भाइटीका (किजा पूजा)', type: 'religious' },
+    { bsDate: '2082-07-07', adDate: '2025-10-24', nameEng: 'World Information Development Day', nameNep: 'विश्व विकास सूचना दिवस', type: 'observance' },
+    { bsDate: '2082-07-10', adDate: '2025-10-27', nameEng: 'Chhath Puja', nameNep: 'छठपर्व', type: 'religious' },
+    { bsDate: '2082-07-19', adDate: '2025-11-05', nameEng: 'Guru Nanak Jayanti', nameNep: 'गुरु नानक जयन्ती (शिख धर्मावलम्बी)', type: 'religious' },
+    { bsDate: '2082-07-25', adDate: '2025-11-11', nameEng: 'Phalgunanda Jayanti', nameNep: 'फाल्गुनानन्द जयन्ती (किराँत धर्मावलम्बी मात्र)', type: 'religious' },
+    { bsDate: '2082-08-17', adDate: '2025-12-03', nameEng: 'International Day of Persons with Disabilities', nameNep: 'अन्तर्राष्ट्रिय अपाङ्गता दिवस', type: 'observance' },
+    { bsDate: '2082-08-18', adDate: '2025-12-04', nameEng: 'Udhali Festival', nameNep: 'उँधौली पर्व', type: 'religious' },
+    { bsDate: '2082-09-10', adDate: '2025-12-25', nameEng: 'Christmas', nameNep: 'क्रिसमस (इसाई धर्म मात्र)', type: 'religious' },
+    { bsDate: '2082-09-15', adDate: '2025-12-30', nameEng: 'Tamu Lhosar (Gurung New Year)', nameNep: 'तमु (गुरुङ) ल्होसार', type: 'religious' },
+    { bsDate: '2082-09-27', adDate: '2026-01-11', nameEng: 'Prithvi Jayanti', nameNep: 'पृथ्वी जयन्ती', type: 'observance' },
+    { bsDate: '2082-10-01', adDate: '2026-01-15', nameEng: 'Maaghe Sankranti', nameNep: 'माघे संक्रान्ति (घ्यौ:चाकु:सँन्हु)', type: 'religious' },
+    { bsDate: '2082-10-05', adDate: '2026-01-19', nameEng: 'Sonam Lhosar (Tamang New Year)', nameNep: 'सोनाम (तामाङ) ल्होसार', type: 'religious' },
+    { bsDate: '2082-10-09', adDate: '2026-01-23', nameEng: 'Saraswati Jayanti', nameNep: 'सरस्वती जयन्ती', type: 'religious' },
+    { bsDate: '2082-10-16', adDate: '2026-01-30', nameEng: 'Shahid Day (Martyrs Day)', nameNep: 'शहीद दिवस', type: 'national' },
+    { bsDate: '2082-11-03', adDate: '2026-02-15', nameEng: 'Maha Shivaratri', nameNep: 'महाशिवरात्रि व्रत', type: 'religious' },
+    { bsDate: '2082-11-06', adDate: '2026-02-18', nameEng: 'Gyalpo Lhosar (Bhutanese New Year)', nameNep: 'ग्याल्पो ल्होसार', type: 'religious' },
+    { bsDate: '2082-11-07', adDate: '2026-02-19', nameEng: 'National Democracy Day', nameNep: 'राष्ट्रिय प्रजातन्त्र दिवस', type: 'national' },
+    { bsDate: '2082-11-18', adDate: '2026-03-02', nameEng: 'Holi (Phagwa) - Hill Region', nameNep: 'पहाडमा होली', type: 'religious' },
+    { bsDate: '2082-11-19', adDate: '2026-03-03', nameEng: 'Holi (Phagwa) - Terai Region', nameNep: 'तराईमा होली', type: 'religious' },
+    { bsDate: '2082-11-20', adDate: '2026-03-04', nameEng: 'Election Holiday', nameNep: 'निर्वाचन बिदा, २०८२', type: 'observance' },
+    { bsDate: '2082-11-21', adDate: '2026-03-05', nameEng: 'Representative Assembly Election', nameNep: 'प्रतिनिधि सभा निर्वाचन, २०८२', type: 'observance' },
+    { bsDate: '2082-11-22', adDate: '2026-03-06', nameEng: 'Election Holiday', nameNep: 'निर्वाचन बिदा, २०८२', type: 'observance' },
+    { bsDate: '2082-11-24', adDate: '2026-03-08', nameEng: 'International Women\'s Day', nameNep: 'अन्तर्राष्ट्रिय नारी दिवस', type: 'observance' },
+    { bsDate: '2082-12-04', adDate: '2026-03-18', nameEng: 'Ghode Jatra (Kathmandu only)', nameNep: 'घोडेजात्रा (काठमाडौं मात्र)', type: 'religious' },
+    { bsDate: '2082-12-13', adDate: '2026-03-27', nameEng: 'Ram Navami', nameNep: 'रामनवमी ब्रत (रामजयन्ती)', type: 'religious' },
+    // 2083 BS Holidays (2026-2027 AD)
+// प्रमुख सार्वजनिक तथा पर्व बिदाहरू
+    { bsDate: '2083-01-01', adDate: '2026-04-14', nameEng: 'Nepali New Year', nameNep: 'नयाँ वर्ष', type: 'national' },
+    { bsDate: '2083-01-18', adDate: '2026-05-01', nameEng: 'World Labour Day', nameNep: 'विश्व मजदुर दिवस', type: 'national' },
+    { bsDate: '2083-01-18', adDate: '2026-05-01', nameEng: 'Buddha Jayanti / Ubhauli Parba', nameNep: 'बुद्ध जयन्ती / उभौली पर्व', type: 'religious' },
+    { bsDate: '2083-02-15', adDate: '2026-05-29', nameEng: 'Republic Day', nameNep: 'गणतन्त्र दिवस', type: 'national' },
+    { bsDate: '2083-05-12', adDate: '2026-08-28', nameEng: 'Raksha Bandhan', nameNep: 'रक्षाबन्धन', type: 'religious' },
+    { bsDate: '2083-05-19', adDate: '2026-09-04', nameEng: 'Shri Krishna Janmashtami', nameNep: 'श्रीकृष्ण जन्माष्टमी', type: 'religious' },
+    { bsDate: '2083-06-03', adDate: '2026-09-19', nameEng: 'Constitution Day', nameNep: 'संविधान दिवस', type: 'national' },
+    { bsDate: '2083-06-25', adDate: '2026-10-11', nameEng: 'Ghatasthapana', nameNep: 'घटस्थापना', type: 'religious' },
+    { bsDate: '2083-06-31', adDate: '2026-10-17', nameEng: 'Dashain Holiday (Phulpati)', nameNep: 'दशैं बिदा (फूलपाती)', type: 'national' },
+    { bsDate: '2083-07-06', adDate: '2026-10-23', nameEng: 'Dashain Holiday (Dwadashi)', nameNep: 'दशैं बिदा (द्वादशी)', type: 'national' },
+    { bsDate: '2083-07-22', adDate: '2026-11-08', nameEng: 'Tihar Holiday (Laxmi Puja)', nameNep: 'तिहार बिदा (लक्ष्मीपूजा)', type: 'national' },
+    { bsDate: '2083-07-26', adDate: '2026-11-12', nameEng: 'Tihar Holiday (Day after Bhaitika)', nameNep: 'तिहार बिदा (भाइटीकाको भोलिपल्ट)', type: 'national' },
+    { bsDate: '2083-07-29', adDate: '2026-11-15', nameEng: 'Chhath Parba', nameNep: 'छठ पर्व', type: 'religious' },
+    { bsDate: '2083-09-09', adDate: '2026-12-24', nameEng: 'Udhauli Parba / Yomari Punhi', nameNep: 'उधौली पर्व / योमरी पुन्हि', type: 'religious' },
+    { bsDate: '2083-09-10', adDate: '2026-12-25', nameEng: 'Christmas Day', nameNep: 'क्रिसमस डे', type: 'religious' },
+    { bsDate: '2083-09-15', adDate: '2026-12-30', nameEng: 'Tamu Lhosar', nameNep: 'तमू ल्होछार', type: 'religious' },
+    { bsDate: '2083-09-27', adDate: '2027-01-11', nameEng: 'Prithvi Jayanti (National Unity Day)', nameNep: 'पृथ्वी जयन्ती (राष्ट्रिय एकता दिवस)', type: 'national' },
+    { bsDate: '2083-10-01', adDate: '2027-01-15', nameEng: 'Maghi Parba / Maghe Sankranti', nameNep: 'माघी पर्व / माघे सङ्क्रान्ति', type: 'religious' },
+    { bsDate: '2083-10-16', adDate: '2027-01-30', nameEng: 'Martyrs Day', nameNep: 'सहिद दिवस', type: 'national' },
+    { bsDate: '2083-10-24', adDate: '2027-02-07', nameEng: 'Sonam Lhosar', nameNep: 'सोनम ल्होछार', type: 'religious' },
+    { bsDate: '2083-11-07', adDate: '2027-02-19', nameEng: 'National Democracy Day', nameNep: 'राष्ट्रिय प्रजातन्त्र दिवस', type: 'national' },
+    { bsDate: '2083-11-22', adDate: '2027-03-06', nameEng: 'Maha Shivaratri', nameNep: 'महाशिवरात्री', type: 'religious' },
+    { bsDate: '2083-11-24', adDate: '2027-03-08', nameEng: 'International Womens Day', nameNep: 'अन्तर्राष्ट्रिय महिला दिवस', type: 'national' },
+    { bsDate: '2083-11-25', adDate: '2027-03-09', nameEng: 'Gyalpo Lhosar', nameNep: 'ग्याल्पो ल्होसार', type: 'religious' },
+    { bsDate: '2083-12-07', adDate: '2027-03-21', nameEng: 'Fagu Purnima (Hilly Regions)', nameNep: 'फागुपूर्णिमा (पहाडी र हिमाली)', type: 'religious' },
+    { bsDate: '2083-12-08', adDate: '2027-03-22', nameEng: 'Fagu Purnima (Terai Regions)', nameNep: 'फागुपूर्णिमा (तराई)', type: 'religious' },
+
+    // विशेष/क्षेत्रीय बिदाहरू
+    { bsDate: '2083-05-13', adDate: '2026-08-29', nameEng: 'Gaijatra', nameNep: 'गाईजात्रा', type: 'religious' },
+    { bsDate: '2083-05-19', adDate: '2026-09-04', nameEng: 'Gaura Parba', nameNep: 'गौरा पर्व', type: 'religious' },
+    { bsDate: '2083-05-29', adDate: '2026-09-14', nameEng: 'Haritalika Teej', nameNep: 'हरितालिका (तीज)', type: 'religious' },
+    { bsDate: '2083-06-09', adDate: '2026-09-25', nameEng: 'Indrajatra', nameNep: 'इन्द्रजात्रा', type: 'religious' },
+    { bsDate: '2083-06-18', adDate: '2026-10-04', nameEng: 'Jitiya Parba', nameNep: 'जितिया पर्व', type: 'religious' },
+    { bsDate: '2083-08-17', adDate: '2026-12-03', nameEng: 'Intl. Day of Persons with Disabilities', nameNep: 'अन्तर्राष्ट्रिय अपाङ्गता दिवस', type: 'observance' },
+    { bsDate: '2083-10-28', adDate: '2027-02-11', nameEng: 'Basant Panchami', nameNep: 'वसन्त पञ्चमी', type: 'religious' },
+    { bsDate: '2083-12-23', adDate: '2027-04-06', nameEng: 'Ghode Jatra', nameNep: 'घोडेजात्रा', type: 'religious' },
+  ];
+
+  /**
+   * Get all holidays for a specific BS year
+   * @param {number} bsYear - Bikram Sambat year
+   * @return {Array} Array of holiday objects for that year
+   */
+  function getHolidaysForYear(bsYear) {
+    return HOLIDAYS_DB.filter(function (holiday) {
+      var yearFromDate = parseInt(holiday.bsDate.split('-')[0]);
+      return yearFromDate === bsYear;
+    });
+  }
+
+  /**
+   * Get all holidays for a specific month and year in BS
+   * @param {number} bsYear - Bikram Sambat year
+   * @param {number} bsMonth - Bikram Sambat month (1-12)
+   * @return {Array} Array of holiday objects for that month
+   */
+  function getHolidaysForMonth(bsYear, bsMonth) {
+    return HOLIDAYS_DB.filter(function (holiday) {
+      var parts = holiday.bsDate.split('-');
+      var yearFromDate = parseInt(parts[0]);
+      var monthFromDate = parseInt(parts[1]);
+      return yearFromDate === bsYear && monthFromDate === bsMonth;
+    });
+  }
+
+  /**
+   * Get holidays by type
+   * @param {string} type - holiday type: 'national', 'religious', or 'observance'
+   * @return {Array} Array of holiday objects of specified type
+   */
+  function getHolidaysByType(type) {
+    return HOLIDAYS_DB.filter(function (holiday) {
+      return holiday.type === type;
+    });
+  }
+
+  /**
+   * Get upcoming holidays from today onwards
+   * @param {number} [days=365] - Number of days to look ahead
+   * @return {Array} Array of upcoming holiday objects
+   */
+  function getUpcomingHolidays(days) {
+    if (!days) days = 365;
+    
+    return HOLIDAYS_DB.filter(function (holiday) {
+      var adDate = new Date(holiday.adDate);
+      var today = new Date();
+      return adDate >= today;
+    });
+  }
+
+  /**
+   * Check if a specific date is a holiday (BS date)
+   * @param {string} bsDate - Date in YYYY-MM-DD format (BS)
+   * @return {Object|null} Holiday object if it's a holiday, null otherwise
+   */
+  function isHolidayBS(bsDate) {
+    for (var i = 0; i < HOLIDAYS_DB.length; i++) {
+      if (HOLIDAYS_DB[i].bsDate === bsDate) {
+        return HOLIDAYS_DB[i];
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Check if a specific AD date is a holiday
+   * @param {string} adDate - Date in YYYY-MM-DD format (AD)
+   * @return {Object|null} Holiday object if it's a holiday, null otherwise
+   */
+  function isHolidayAD(adDate) {
+    for (var i = 0; i < HOLIDAYS_DB.length; i++) {
+      if (HOLIDAYS_DB[i].adDate === adDate) {
+        return HOLIDAYS_DB[i];
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Get holiday info by either BS or AD date (auto-detect)
+   * @param {string} dateStr - Date in YYYY-MM-DD format
+   * @return {Object|null} Holiday object if found, null otherwise
+   */
+  function getHolidayInfo(dateStr) {
+    return isHolidayBS(dateStr) || isHolidayAD(dateStr);
+  }
+
+  /**
+   * Get total number of holidays in database
+   * @return {number} Total count of holidays
+   */
+  function getTotalHolidays() {
+    return HOLIDAYS_DB.length;
+  }
+
+  /**
+   * Get all unique years with holidays
+   * @return {Array} Array of years with holidays
+   */
+  function getAvailableYears() {
+    var years = {};
+    HOLIDAYS_DB.forEach(function (holiday) {
+      var year = parseInt(holiday.bsDate.split('-')[0]);
+      years[year] = true;
+    });
+    return Object.keys(years).map(Number).sort(function (a, b) {
+      return a - b;
+    });
+  }
+
+  /**
+   * Get holiday display string with both BS and AD dates in both languages
+   * @param {string} bsDate - Date in YYYY-MM-DD format (BS)
+   * @return {string} Formatted holiday string
+   */
+  function getHolidayDisplay(bsDate) {
+    var holiday = isHolidayBS(bsDate);
+    if (holiday) {
+      return holiday.nameEng + ' (' + holiday.nameNep + ') - ' + holiday.bsDate + ' BS / ' + holiday.adDate + ' AD';
+    }
+    return null;
+  }
+
+  /**
+   * Format holidays as HTML table with bilingual names
+   * @param {number} bsYear - Bikram Sambat year
+   * @return {string} HTML table string
+   */
+  function formatHolidaysAsHTML(bsYear) {
+    var holidays = getHolidaysForYear(bsYear);
+    if (holidays.length === 0) {
+      return '<p>No holidays found for year ' + bsYear + ' BS</p>';
+    }
+    
+    var html = '<table style="border-collapse: collapse; width: 100%;">\n';
+    html += '<thead style="background-color: #f2f2f2;">\n';
+    html += '<tr>\n';
+    html += '<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Holiday (English)</th>\n';
+    html += '<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Holiday (Nepali)</th>\n';
+    html += '<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">BS Date</th>\n';
+    html += '<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">AD Date</th>\n';
+    html += '<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Type</th>\n';
+    html += '</tr>\n';
+    html += '</thead>\n';
+    html += '<tbody>\n';
+    
+    for (var i = 0; i < holidays.length; i++) {
+      var h = holidays[i];
+      var bgColor = h.type === 'national' ? '#e8f5e9' : (h.type === 'religious' ? '#f3e5f5' : '#fff3e0');
+      html += '<tr style="background-color: ' + bgColor + ';">\n';
+      html += '<td style="border: 1px solid #ddd; padding: 8px;">' + h.nameEng + '</td>\n';
+      html += '<td style="border: 1px solid #ddd; padding: 8px;">' + h.nameNep + '</td>\n';
+      html += '<td style="border: 1px solid #ddd; padding: 8px;">' + h.bsDate + '</td>\n';
+      html += '<td style="border: 1px solid #ddd; padding: 8px;">' + h.adDate + '</td>\n';
+      html += '<td style="border: 1px solid #ddd; padding: 8px;">' + h.type + '</td>\n';
+      html += '</tr>\n';
+    }
+    
+    html += '</tbody>\n';
+    html += '</table>\n';
+    return html;
+  }
+
+  /**
+   * Format holidays as formatted text/string with bilingual names
+   * @param {number} bsYear - Bikram Sambat year
+   * @param {boolean} [withType=true] - Include holiday type in output
+   * @return {string} Formatted text string
+   */
+  function formatHolidaysAsText(bsYear, withType) {
+    if (withType === undefined) withType = true;
+    
+    var holidays = getHolidaysForYear(bsYear);
+    if (holidays.length === 0) {
+      return 'No holidays found for year ' + bsYear + ' BS';
+    }
+    
+    var text = 'Holidays for BS Year ' + bsYear + ' (' + holidays.length + ' holidays)\n';
+    text += '====================================\n\n';
+    
+    for (var i = 0; i < holidays.length; i++) {
+      var h = holidays[i];
+      text += (i + 1) + '. ' + h.nameEng + ' | ' + h.nameNep + '\n';
+      text += '   BS Date: ' + h.bsDate + ' | AD Date: ' + h.adDate + '\n';
+      if (withType) {
+        text += '   Type: ' + h.type.toUpperCase() + '\n';
+      }
+      text += '\n';
+    }
+    
+    return text;
+  }
+
+  /**
+   * Format holidays as CSV with bilingual names
+   * @param {number} bsYear - Bikram Sambat year
+   * @return {string} CSV formatted string
+   */
+  function formatHolidaysAsCSV(bsYear) {
+    var holidays = getHolidaysForYear(bsYear);
+    var csv = 'Holiday (English),Holiday (Nepali),BS Date,AD Date,Type\n';
+    
+    for (var i = 0; i < holidays.length; i++) {
+      var h = holidays[i];
+      csv += '"' + h.nameEng + '","' + h.nameNep + '",' + h.bsDate + ',' + h.adDate + ',' + h.type + '\n';
+    }
+    
+    return csv;
+  }
+
+  /**
+   * Format holidays as JSON array with bilingual names
+   * @param {number} bsYear - Bikram Sambat year
+   * @return {string} JSON formatted string
+   */
+  function formatHolidaysAsJSON(bsYear, pretty) {
+    if (pretty === undefined) pretty = true;
+    var holidays = getHolidaysForYear(bsYear);
+    
+    if (pretty) {
+      return JSON.stringify(holidays, null, 2);
+    } else {
+      return JSON.stringify(holidays);
+    }
+  }
+
+  /**
+   * Display holidays in console (for debugging/testing) with bilingual names
+   * @param {number} bsYear - Bikram Sambat year
+   */
+  function logHolidaysForYear(bsYear) {
+    var holidays = getHolidaysForYear(bsYear);
+    console.log('Holidays for BS year ' + bsYear + ':');
+    console.table(holidays);
+  }
+
   // Return the public API
   return {
     // Main conversion functions
@@ -663,15 +1000,35 @@
     isValidBS: isValidBS,
     isValidAD: isValidAD,
     
+    // Holiday functions
+    getHolidaysForYear: getHolidaysForYear,
+    getHolidaysForMonth: getHolidaysForMonth,
+    getHolidaysByType: getHolidaysByType,
+    getUpcomingHolidays: getUpcomingHolidays,
+    isHolidayBS: isHolidayBS,
+    isHolidayAD: isHolidayAD,
+    getHolidayInfo: getHolidayInfo,
+    getTotalHolidays: getTotalHolidays,
+    getAvailableYears: getAvailableYears,
+    getHolidayDisplay: getHolidayDisplay,
+    
+    // Holiday formatting functions
+    formatHolidaysAsHTML: formatHolidaysAsHTML,
+    formatHolidaysAsText: formatHolidaysAsText,
+    formatHolidaysAsCSV: formatHolidaysAsCSV,
+    formatHolidaysAsJSON: formatHolidaysAsJSON,
+    logHolidaysForYear: logHolidaysForYear,
+    
     // Data
     BSMonths: BSMonths,
     MONTH_NAMES_EN: MONTH_NAMES_EN,
     MONTH_NAMES_NE: MONTH_NAMES_NE,
     WEEKDAY_NAMES_EN: WEEKDAY_NAMES_EN,
     WEEKDAY_NAMES_NE: WEEKDAY_NAMES_NE,
+    HOLIDAYS_DB: HOLIDAYS_DB,
     
     // Version
-    version: '2.0.1'
+    version: '2.1.0'
   };
 }));
 
@@ -685,3 +1042,15 @@
 
 //node -e "const N = require('./NepaliBStoAD.js'); const bs = N.AD_TO_BS('1992-03-22', true); console.log('AD 1992-03-22 =', bs.format('YYYY-MM-DD, mmmm DD, dddd'), bs.getWeekday(true));"
 //AD 1992-03-22 = 2048-12-09, चैत 09, Sunday आइतबार
+
+/*
+const holiday = NepaliDate.isHolidayBS('2082-01-01');
+// Returns: { nameEng: 'Nepali New Year', nameNep: 'नेपाली नववर्ष', ... }
+
+// Display both names
+console.log(NepaliDate.getHolidayDisplay('2082-01-01'));
+// Output: Nepali New Year (नेपाली नववर्ष) - 2082-01-01 BS / 2025-04-14 AD
+
+// Format with both names
+console.log(NepaliDate.formatHolidaysAsText(2082));
+*/

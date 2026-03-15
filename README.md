@@ -18,6 +18,9 @@ A universal JavaScript library for converting dates between Bikram Sambat (BS) a
 
 - ✅ Convert BS dates to AD dates (`BS_TO_AD`)
 - ✅ Convert AD dates to BS dates (`AD_TO_BS`)
+- ✅ **Nepali Holidays Database** (39+ holidays with bilingual names)
+- ✅ **Holiday Lookup** (check if date is a holiday)
+- ✅ **Holiday Formatting** (HTML, CSV, JSON, Text formats)
 - ✅ Support for multiple date formats
 - ✅ Comprehensive month name recognition (English & Nepali)
 - ✅ Google Sheets custom function integration
@@ -96,6 +99,50 @@ bs.format('YYYY MMMM DD');                   // "2082 Magh 10"
 bs.format('YYYY mmmm DD');                   // "2082 माघ 10"
 bs.getWeekday();                             // "Friday"
 bs.getWeekday(true);                         // "शुक्रबार"
+```
+
+## Nepali Holidays
+
+The library includes a comprehensive database of Nepali holidays with bilingual (English & Nepali) names.
+
+```javascript
+// Get all holidays for a year
+NepaliDate.getHolidaysForYear(2082);        // Returns array of 13 holidays
+
+// Check if a date is a holiday
+NepaliDate.isHolidayBS('2082-01-01');      // { nameEng: 'Nepali New Year', nameNep: 'नेपाली नववर्ष', ... }
+NepaliDate.isHolidayAD('2025-04-14');      // Same holiday data
+
+// Get holiday display string
+NepaliDate.getHolidayDisplay('2082-01-01'); // "Nepali New Year (नेपाली नववर्ष) - 2082-01-01 BS / 2025-04-14 AD"
+
+// Format holidays for display
+NepaliDate.formatHolidaysAsText(2082);      // Text format with both names
+NepaliDate.formatHolidaysAsHTML(2082);      // HTML table
+NepaliDate.formatHolidaysAsCSV(2082);       // CSV export
+NepaliDate.formatHolidaysAsJSON(2082);      // JSON array
+
+// Get holidays by type
+NepaliDate.getHolidaysByType('national');   // National holidays
+NepaliDate.getHolidaysByType('religious');  // Religious holidays
+NepaliDate.getHolidaysByType('observance'); // Observances
+
+// Get upcoming holidays
+NepaliDate.getUpcomingHolidays();           // All future holidays
+
+// Get available years with holiday data
+NepaliDate.getAvailableYears();             // [2081, 2082, 2083, 2084, 2085]
+```
+
+### Holiday Data Structure
+```javascript
+{
+  bsDate: '2082-01-01',
+  adDate: '2025-04-14',
+  nameEng: 'Nepali New Year',      // English name
+  nameNep: 'नेपाली नववर्ष',         // Nepali name
+  type: 'national'                  // national|religious|observance
+}
 ```
 
 ## Supported Date Formats
@@ -262,6 +309,166 @@ bs.format('dddd, MMMM D');    // "Saturday, Magh 10"
 
 ---
 
+### Holiday Functions
+
+#### `getHolidaysForYear(bsYear)`
+Get all holidays for a specific BS year.
+
+```javascript
+NepaliDate.getHolidaysForYear(2082);  // Returns array of 13 holidays
+```
+
+**Parameters:**
+- `bsYear` (number): Bikram Sambat year
+
+**Returns:** Array of holiday objects
+
+---
+
+#### `getHolidaysForMonth(bsYear, bsMonth)`
+Get holidays for a specific month.
+
+```javascript
+NepaliDate.getHolidaysForMonth(2082, 1);  // Holidays in Baishakh
+```
+
+---
+
+#### `getHolidaysByType(type)`
+Filter holidays by type.
+
+```javascript
+NepaliDate.getHolidaysByType('national');   // National holidays
+NepaliDate.getHolidaysByType('religious');  // Religious holidays
+NepaliDate.getHolidaysByType('observance'); // Observances
+```
+
+---
+
+#### `isHolidayBS(bsDate)`
+Check if a BS date is a holiday.
+
+```javascript
+NepaliDate.isHolidayBS('2082-01-01');  // Holiday object or null
+```
+
+---
+
+#### `isHolidayAD(adDate)`
+Check if an AD date is a holiday.
+
+```javascript
+NepaliDate.isHolidayAD('2025-04-14');  // Holiday object or null
+```
+
+---
+
+#### `getHolidayInfo(dateStr)`
+Auto-detect format and get holiday info.
+
+```javascript
+NepaliDate.getHolidayInfo('2082-01-01');  // Works with both BS and AD dates
+```
+
+---
+
+#### `getHolidayDisplay(bsDate)`
+Get formatted holiday string with both names and dates.
+
+```javascript
+NepaliDate.getHolidayDisplay('2082-01-01');
+// "Nepali New Year (नेपाली नववर्ष) - 2082-01-01 BS / 2025-04-14 AD"
+```
+
+---
+
+#### `formatHolidaysAsText(bsYear, withType)`
+Format holidays as readable text.
+
+```javascript
+NepaliDate.formatHolidaysAsText(2082);
+// 1. Nepali New Year | नेपाली नववर्ष
+//    BS Date: 2082-01-01 | AD Date: 2025-04-14
+//    Type: NATIONAL
+// ...
+```
+
+---
+
+#### `formatHolidaysAsHTML(bsYear)`
+Format holidays as HTML table.
+
+```javascript
+const htmlTable = NepaliDate.formatHolidaysAsHTML(2082);
+document.getElementById('holidays').innerHTML = htmlTable;
+```
+
+Output includes columns:
+- Holiday (English)
+- Holiday (Nepali)
+- BS Date
+- AD Date
+- Type
+
+---
+
+#### `formatHolidaysAsCSV(bsYear)`
+Format holidays as CSV for export.
+
+```javascript
+const csv = NepaliDate.formatHolidaysAsCSV(2082);
+// Can be saved to .csv file or imported to Excel
+```
+
+---
+
+#### `formatHolidaysAsJSON(bsYear, pretty)`
+Format holidays as JSON array.
+
+```javascript
+NepaliDate.formatHolidaysAsJSON(2082);      // Pretty formatted
+NepaliDate.formatHolidaysAsJSON(2082, false); // Compact
+```
+
+---
+
+#### `getUpcomingHolidays(days)`
+Get upcoming holidays from today.
+
+```javascript
+NepaliDate.getUpcomingHolidays();    // All future holidays
+NepaliDate.getUpcomingHolidays(365); // Next 365 days
+```
+
+---
+
+#### `getTotalHolidays()`
+Get total number of holidays in database.
+
+```javascript
+NepaliDate.getTotalHolidays();  // 39
+```
+
+---
+
+#### `getAvailableYears()`
+Get all BS years with holiday data.
+
+```javascript
+NepaliDate.getAvailableYears();  // [2081, 2082, 2083, 2084, 2085]
+```
+
+---
+
+#### `logHolidaysForYear(bsYear)`
+Log holidays to console (for debugging).
+
+```javascript
+NepaliDate.logHolidaysForYear(2082);  // Displays table in console
+```
+
+---
+
 ### Data Constants
 
 ```javascript
@@ -270,7 +477,8 @@ NepaliDate.MONTH_NAMES_EN;    // ['Baishakh', 'Jestha', ...]
 NepaliDate.MONTH_NAMES_NE;    // ['वैशाख', 'ज्येष्ठ', ...]
 NepaliDate.WEEKDAY_NAMES_EN;  // ['Sunday', 'Monday', ...]
 NepaliDate.WEEKDAY_NAMES_NE;  // ['आइतबार', 'सोमबार', ...]
-NepaliDate.version;           // '2.0.0'
+NepaliDate.HOLIDAYS_DB;       // Array of all holiday objects
+NepaliDate.version;           // '2.1.0'
 ```
 
 ## Google Sheets Usage
@@ -319,6 +527,15 @@ The library provides descriptive error messages:
 - Accounts for BS calendar irregularities
 
 ## Changelog
+
+### Version 2.1.0
+- ✅ **NEW:** Nepali Holidays Database (39+ holidays)
+- ✅ **NEW:** Holiday lookup functions (`isHolidayBS()`, `isHolidayAD()`)
+- ✅ **NEW:** Holiday filtering by type (national, religious, observance)
+- ✅ **NEW:** Multiple holiday formatting options (HTML, CSV, JSON, Text)
+- ✅ **NEW:** Bilingual holiday names (English & Nepali)
+- ✅ **NEW:** Upcoming holidays retrieval
+- ✅ Year coverage: 2081-2085 BS (2024-2029 AD)
 
 ### Version 2.0.1
 - 🐞 Fixed: 2082 Baishakh now has 31 days (was 30)
