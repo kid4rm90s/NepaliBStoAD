@@ -2,7 +2,7 @@
  * NepaliDate - Nepali (Bikram Sambat) Date Conversion Library
  * Converts dates between BS (Bikram Sambat) and AD (Anno Domini)
  * 
- * @version 2.1.2
+ * @version 2.1.3
  * @license MIT
  * 
  * Usage:
@@ -707,43 +707,49 @@
     { bsDate: '2082-11-24', adDate: '2026-03-08', nameEng: 'International Women\'s Day', nameNep: 'अन्तर्राष्ट्रिय नारी दिवस', type: 'observance' },
     { bsDate: '2082-12-04', adDate: '2026-03-18', nameEng: 'Ghode Jatra (Kathmandu only)', nameNep: 'घोडेजात्रा (काठमाडौं मात्र)', type: 'religious' },
     { bsDate: '2082-12-13', adDate: '2026-03-27', nameEng: 'Ram Navami', nameNep: 'रामनवमी ब्रत (रामजयन्ती)', type: 'religious' },
+
     // 2083 BS Holidays (2026-2027 AD)
-// प्रमुख सार्वजनिक तथा पर्व बिदाहरू
     { bsDate: '2083-01-01', adDate: '2026-04-14', nameEng: 'Nepali New Year', nameNep: 'नयाँ वर्ष', type: 'national' },
     { bsDate: '2083-01-18', adDate: '2026-05-01', nameEng: 'World Labour Day', nameNep: 'विश्व मजदुर दिवस', type: 'national' },
     { bsDate: '2083-01-18', adDate: '2026-05-01', nameEng: 'Buddha Jayanti / Ubhauli Parba', nameNep: 'बुद्ध जयन्ती / उभौली पर्व', type: 'religious' },
     { bsDate: '2083-02-15', adDate: '2026-05-29', nameEng: 'Republic Day', nameNep: 'गणतन्त्र दिवस', type: 'national' },
     { bsDate: '2083-05-12', adDate: '2026-08-28', nameEng: 'Raksha Bandhan', nameNep: 'रक्षाबन्धन', type: 'religious' },
+    { bsDate: '2083-05-13', adDate: '2026-08-29', nameEng: 'Gaijatra', nameNep: 'गाईजात्रा', type: 'religious' },
     { bsDate: '2083-05-19', adDate: '2026-09-04', nameEng: 'Shri Krishna Janmashtami', nameNep: 'श्रीकृष्ण जन्माष्टमी', type: 'religious' },
+    { bsDate: '2083-05-19', adDate: '2026-09-04', nameEng: 'Gaura Parba', nameNep: 'गौरा पर्व', type: 'religious' },
+    { bsDate: '2083-05-29', adDate: '2026-09-14', nameEng: 'Haritalika Teej', nameNep: 'हरितालिका (तीज)', type: 'religious' },
     { bsDate: '2083-06-03', adDate: '2026-09-19', nameEng: 'Constitution Day', nameNep: 'संविधान दिवस', type: 'national' },
+    { bsDate: '2083-06-09', adDate: '2026-09-25', nameEng: 'Indrajatra', nameNep: 'इन्द्रजात्रा', type: 'religious' },
+    { bsDate: '2083-06-18', adDate: '2026-10-04', nameEng: 'Jitiya Parba', nameNep: 'जितिया पर्व', type: 'religious' },
     { bsDate: '2083-06-25', adDate: '2026-10-11', nameEng: 'Ghatasthapana', nameNep: 'घटस्थापना', type: 'religious' },
     { bsDate: '2083-06-31', adDate: '2026-10-17', nameEng: 'Dashain Holiday (Phulpati)', nameNep: 'दशैं बिदा (फूलपाती)', type: 'national' },
+    { bsDate: '2083-07-01', adDate: '2026-10-18', nameEng: 'Maha Ashtami', nameNep: 'महाष्टमी', type: 'religious' },
+    { bsDate: '2083-07-02', adDate: '2026-10-19', nameEng: 'Maha Navami', nameNep: 'महानवमी', type: 'religious' },
+    { bsDate: '2083-07-03', adDate: '2026-10-20', nameEng: 'Vijaya Dasami', nameNep: 'विजया दशमी', type: 'national' },
+    { bsDate: '2083-07-04', adDate: '2026-10-21', nameEng: 'Ekadashi', nameNep: 'एकादशी', type: 'national' },
+    { bsDate: '2083-07-05', adDate: '2026-10-22', nameEng: 'Dwadashi', nameNep: 'द्वादशी', type: 'national' },
     { bsDate: '2083-07-06', adDate: '2026-10-23', nameEng: 'Dashain Holiday (Dwadashi)', nameNep: 'दशैं बिदा (द्वादशी)', type: 'national' },
     { bsDate: '2083-07-22', adDate: '2026-11-08', nameEng: 'Tihar Holiday (Laxmi Puja)', nameNep: 'तिहार बिदा (लक्ष्मीपूजा)', type: 'national' },
+    { bsDate: '2083-07-23', adDate: '2026-11-09', nameEng: 'Gai Puja', nameNep: 'गाई पूजा', type: 'religious' },
+    { bsDate: '2083-07-24', adDate: '2026-11-10', nameEng: 'Mha Puja / Govardhan Puja', nameNep: 'म्ह पूजा / गोवर्द्धन पूजा', type: 'religious' },
+    { bsDate: '2083-07-25', adDate: '2026-11-11', nameEng: 'Bhai Tika', nameNep: 'भाइटीका', type: 'religious' },
     { bsDate: '2083-07-26', adDate: '2026-11-12', nameEng: 'Tihar Holiday (Day after Bhaitika)', nameNep: 'तिहार बिदा (भाइटीकाको भोलिपल्ट)', type: 'national' },
     { bsDate: '2083-07-29', adDate: '2026-11-15', nameEng: 'Chhath Parba', nameNep: 'छठ पर्व', type: 'religious' },
+    { bsDate: '2083-08-17', adDate: '2026-12-03', nameEng: 'Intl. Day of Persons with Disabilities', nameNep: 'अन्तर्राष्ट्रिय अपाङ्गता दिवस', type: 'observance' },
     { bsDate: '2083-09-09', adDate: '2026-12-24', nameEng: 'Udhauli Parba / Yomari Punhi', nameNep: 'उधौली पर्व / योमरी पुन्हि', type: 'religious' },
     { bsDate: '2083-09-10', adDate: '2026-12-25', nameEng: 'Christmas Day', nameNep: 'क्रिसमस डे', type: 'religious' },
     { bsDate: '2083-09-15', adDate: '2026-12-30', nameEng: 'Tamu Lhosar', nameNep: 'तमू ल्होछार', type: 'religious' },
-    { bsDate: '2083-09-27', adDate: '2027-01-11', nameEng: 'Prithvi Jayanti (National Unity Day)', nameNep: 'पृथ्वी जयन्ती (राष्ट्रिय एकता दिवस)', type: 'national' },
+    { bsDate: '2083-09-27', adDate: '2027-01-11', nameEng: 'Prithvi Jayanti', nameNep: 'पृथ्वी जयन्ती', type: 'national' },
     { bsDate: '2083-10-01', adDate: '2027-01-15', nameEng: 'Maghi Parba / Maghe Sankranti', nameNep: 'माघी पर्व / माघे सङ्क्रान्ति', type: 'religious' },
     { bsDate: '2083-10-16', adDate: '2027-01-30', nameEng: 'Martyrs Day', nameNep: 'सहिद दिवस', type: 'national' },
     { bsDate: '2083-10-24', adDate: '2027-02-07', nameEng: 'Sonam Lhosar', nameNep: 'सोनम ल्होछार', type: 'religious' },
+    { bsDate: '2083-10-28', adDate: '2027-02-11', nameEng: 'Basant Panchami', nameNep: 'वसन्त पञ्चमी', type: 'religious' },
     { bsDate: '2083-11-07', adDate: '2027-02-19', nameEng: 'National Democracy Day', nameNep: 'राष्ट्रिय प्रजातन्त्र दिवस', type: 'national' },
     { bsDate: '2083-11-22', adDate: '2027-03-06', nameEng: 'Maha Shivaratri', nameNep: 'महाशिवरात्री', type: 'religious' },
     { bsDate: '2083-11-24', adDate: '2027-03-08', nameEng: 'International Womens Day', nameNep: 'अन्तर्राष्ट्रिय महिला दिवस', type: 'national' },
     { bsDate: '2083-11-25', adDate: '2027-03-09', nameEng: 'Gyalpo Lhosar', nameNep: 'ग्याल्पो ल्होसार', type: 'religious' },
     { bsDate: '2083-12-07', adDate: '2027-03-21', nameEng: 'Fagu Purnima (Hilly Regions)', nameNep: 'फागुपूर्णिमा (पहाडी र हिमाली)', type: 'religious' },
     { bsDate: '2083-12-08', adDate: '2027-03-22', nameEng: 'Fagu Purnima (Terai Regions)', nameNep: 'फागुपूर्णिमा (तराई)', type: 'religious' },
-
-    // विशेष/क्षेत्रीय बिदाहरू
-    { bsDate: '2083-05-13', adDate: '2026-08-29', nameEng: 'Gaijatra', nameNep: 'गाईजात्रा', type: 'religious' },
-    { bsDate: '2083-05-19', adDate: '2026-09-04', nameEng: 'Gaura Parba', nameNep: 'गौरा पर्व', type: 'religious' },
-    { bsDate: '2083-05-29', adDate: '2026-09-14', nameEng: 'Haritalika Teej', nameNep: 'हरितालिका (तीज)', type: 'religious' },
-    { bsDate: '2083-06-09', adDate: '2026-09-25', nameEng: 'Indrajatra', nameNep: 'इन्द्रजात्रा', type: 'religious' },
-    { bsDate: '2083-06-18', adDate: '2026-10-04', nameEng: 'Jitiya Parba', nameNep: 'जितिया पर्व', type: 'religious' },
-    { bsDate: '2083-08-17', adDate: '2026-12-03', nameEng: 'Intl. Day of Persons with Disabilities', nameNep: 'अन्तर्राष्ट्रिय अपाङ्गता दिवस', type: 'observance' },
-    { bsDate: '2083-10-28', adDate: '2027-02-11', nameEng: 'Basant Panchami', nameNep: 'वसन्त पञ्चमी', type: 'religious' },
     { bsDate: '2083-12-23', adDate: '2027-04-06', nameEng: 'Ghode Jatra', nameNep: 'घोडेजात्रा', type: 'religious' },
   ];
 
